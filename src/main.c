@@ -17,30 +17,38 @@
 
 char *slurp_file(const char *file_path)
 {
-#define SLURP_FILE_PANIC \
-    do { \
+#define SLURP_FILE_PANIC                                                               \
+    do                                                                                 \
+    {                                                                                  \
         fprintf(stderr, "Could not read file `%s`: %s\n", file_path, strerror(errno)); \
-        exit(1); \
+        exit(1);                                                                       \
     } while (0)
 
     FILE *f = fopen(file_path, "r");
-    if (f == NULL) SLURP_FILE_PANIC;
-    if (fseek(f, 0, SEEK_END) < 0) SLURP_FILE_PANIC;
+    if (f == NULL)
+        SLURP_FILE_PANIC;
+    if (fseek(f, 0, SEEK_END) < 0)
+        SLURP_FILE_PANIC;
 
     long size = ftell(f);
-    if (size < 0) SLURP_FILE_PANIC;
+    if (size < 0)
+        SLURP_FILE_PANIC;
 
     char *buffer = malloc(size + 1);
-    if (buffer == NULL) SLURP_FILE_PANIC;
+    if (buffer == NULL)
+        SLURP_FILE_PANIC;
 
-    if (fseek(f, 0, SEEK_SET) < 0) SLURP_FILE_PANIC;
+    if (fseek(f, 0, SEEK_SET) < 0)
+        SLURP_FILE_PANIC;
 
     fread(buffer, 1, size, f);
-    if (ferror(f) < 0) SLURP_FILE_PANIC;
+    if (ferror(f) < 0)
+        SLURP_FILE_PANIC;
 
     buffer[size] = '\0';
 
-    if (fclose(f) < 0) SLURP_FILE_PANIC;
+    if (fclose(f) < 0)
+        SLURP_FILE_PANIC;
 
     return buffer;
 #undef SLURP_FILE_PANIC
@@ -48,7 +56,8 @@ char *slurp_file(const char *file_path)
 
 const char *shader_type_as_cstr(GLuint shader)
 {
-    switch (shader) {
+    switch (shader)
+    {
     case GL_VERTEX_SHADER:
         return "GL_VERTEX_SHADER";
     case GL_FRAGMENT_SHADER:
@@ -67,7 +76,8 @@ bool compile_shader_source(const GLchar *source, GLenum shader_type, GLuint *sha
     GLint compiled = 0;
     glGetShaderiv(*shader, GL_COMPILE_STATUS, &compiled);
 
-    if (!compiled) {
+    if (!compiled)
+    {
         GLchar message[1024];
         GLsizei message_size = 0;
         glGetShaderInfoLog(*shader, sizeof(message), &message_size, message);
@@ -83,7 +93,8 @@ bool compile_shader_file(const char *file_path, GLenum shader_type, GLuint *shad
 {
     char *source = slurp_file(file_path);
     bool ok = compile_shader_source(source, shader_type, shader);
-    if (!ok) {
+    if (!ok)
+    {
         fprintf(stderr, "ERROR: failed to compile `%s` shader file\n", file_path);
     }
     free(source);
@@ -100,7 +111,8 @@ bool link_program(GLuint vert_shader, GLuint frag_shader, GLuint *program)
 
     GLint linked = 0;
     glGetProgramiv(*program, GL_LINK_STATUS, &linked);
-    if (!linked) {
+    if (!linked)
+    {
         GLsizei message_size = 0;
         GLchar message[1024];
 
@@ -114,7 +126,8 @@ bool link_program(GLuint vert_shader, GLuint frag_shader, GLuint *program)
     return program;
 }
 
-typedef enum {
+typedef enum
+{
     RESOLUTION_UNIFORM = 0,
     TIME_UNIFORM,
     MOUSE_UNIFORM,
@@ -140,16 +153,19 @@ bool load_shader_program(const char *vertex_file_path,
                          GLuint *program)
 {
     GLuint vert = 0;
-    if (!compile_shader_file(vertex_file_path, GL_VERTEX_SHADER, &vert)) {
+    if (!compile_shader_file(vertex_file_path, GL_VERTEX_SHADER, &vert))
+    {
         return false;
     }
 
     GLuint frag = 0;
-    if (!compile_shader_file(fragment_file_path, GL_FRAGMENT_SHADER, &frag)) {
+    if (!compile_shader_file(fragment_file_path, GL_FRAGMENT_SHADER, &frag))
+    {
         return false;
     }
 
-    if (!link_program(vert, frag, program)) {
+    if (!link_program(vert, frag, program))
+    {
         return false;
     }
 
@@ -164,13 +180,15 @@ void reload_shaders(void)
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
     {
-        if (!load_shader_program("main.vert", "main.frag", &main_program)) {
+        if (!load_shader_program("shaders/main.vert", "shaders/main.frag", &main_program))
+        {
             return;
         }
 
         glUseProgram(main_program);
 
-        for (Uniform index = 0; index < COUNT_UNIFORMS; ++index) {
+        for (Uniform index = 0; index < COUNT_UNIFORMS; ++index)
+        {
             main_uniforms[index] = glGetUniformLocation(main_program, uniform_names[index]);
         }
     }
@@ -181,35 +199,45 @@ void reload_shaders(void)
     printf("Successfully Reload the Shaders\n");
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    (void) window;
-    (void) scancode;
-    (void) action;
-    (void) mods;
+    (void)window;
+    (void)scancode;
+    (void)action;
+    (void)mods;
 
-    if (action == GLFW_PRESS) {
-        if (key == GLFW_KEY_F5) {
+    if (action == GLFW_PRESS)
+    {
+        if (key == GLFW_KEY_F5)
+        {
             reload_shaders();
-        } else if (key == GLFW_KEY_SPACE) {
+        }
+        else if (key == GLFW_KEY_SPACE)
+        {
             pause = !pause;
-        } else if (key == GLFW_KEY_Q) {
+        }
+        else if (key == GLFW_KEY_Q)
+        {
             exit(1);
         }
 
-        if (pause) {
-            if (key == GLFW_KEY_LEFT) {
+        if (pause)
+        {
+            if (key == GLFW_KEY_LEFT)
+            {
                 time -= MANUAL_TIME_STEP;
-            } else if (key == GLFW_KEY_RIGHT) {
+            }
+            else if (key == GLFW_KEY_RIGHT)
+            {
                 time += MANUAL_TIME_STEP;
             }
         }
     }
 }
 
-void window_size_callback(GLFWwindow* window, int width, int height)
+void window_size_callback(GLFWwindow *window, int width, int height)
 {
-    (void) window;
+    (void)window;
     glViewport(0, 0, width, height);
 }
 
@@ -218,13 +246,13 @@ void MessageCallback(GLenum source,
                      GLuint id,
                      GLenum severity,
                      GLsizei length,
-                     const GLchar* message,
-                     const void* userParam)
+                     const GLchar *message,
+                     const void *userParam)
 {
-    (void) source;
-    (void) id;
-    (void) length;
-    (void) userParam;
+    (void)source;
+    (void)id;
+    (void)length;
+    (void)userParam;
     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
             (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
             type, severity, message);
@@ -232,18 +260,21 @@ void MessageCallback(GLenum source,
 
 int main()
 {
-    if (!glfwInit()) {
+    if (!glfwInit())
+    {
         fprintf(stderr, "ERROR: could not initialize GLFW\n");
         exit(1);
     }
 
-    GLFWwindow * const window = glfwCreateWindow(
-                                    DEFAULT_SCREEN_WIDTH,
-                                    DEFAULT_SCREEN_HEIGHT,
-                                    "OpenGL Template",
-                                    NULL,
-                                    NULL);
-    if (window == NULL) {
+    GLFWwindow *const window = glfwCreateWindow(
+        DEFAULT_SCREEN_WIDTH,
+        DEFAULT_SCREEN_HEIGHT,
+        "Sco-Op",
+        NULL,
+        NULL);
+        
+    if (window == NULL)
+    {
         fprintf(stderr, "ERROR: could not create a window.\n");
         glfwTerminate();
         exit(1);
@@ -253,12 +284,14 @@ int main()
 
     load_gl_extensions();
 
-    if (glDrawArraysInstanced == NULL) {
+    if (glDrawArraysInstanced == NULL)
+    {
         fprintf(stderr, "Support for EXT_draw_instanced is required!\n");
         exit(1);
     }
 
-    if (glDebugMessageCallback != NULL) {
+    if (glDebugMessageCallback != NULL)
+    {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(MessageCallback, 0);
     }
@@ -273,10 +306,12 @@ int main()
 
     time = glfwGetTime();
     double prev_time;
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window))
+    {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        if (!program_failed) {
+        if (!program_failed)
+        {
             static_assert(COUNT_UNIFORMS == 3, "Update the uniform sync");
             int width, height;
             glfwGetWindowSize(window, &width, &height);
@@ -291,7 +326,8 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
         double cur_time = glfwGetTime();
-        if (!pause) {
+        if (!pause)
+        {
             time += cur_time - prev_time;
         }
         prev_time = cur_time;

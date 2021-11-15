@@ -1,20 +1,22 @@
-# OpenGL Template
+# Sco-Op
 
-Just a simple OpenGL template that I use on my streams.
+Why Sco-Op ? Because I loved playing [Sven Co-op](https://store.steampowered.com/app/225840/Sven_Coop/), so I thought about naming it `Sdeh Co-Op`, since `sdeh` is one of my pseudonyms. But nah, doesn't sounds good. And since it's a scoop i'm working with [OpenGL](https://www.opengl.org), I named Sco-Op.  
 
-## Controls
+So this is going to be a multiplayer shooter game, FPS or TPS, in the style of [Sven Co-op](https://store.steampowered.com/app/225840/Sven_Coop/).
 
-| Shortcut                 | Description                                                                                                                                                               |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| <kbd>q</kbd>             | Quit                                                                                                                                                                      |
-| <kbd>F5</kbd>            | Reload [main.frag](./main.frag) and [main.vert](./main.vert) shaders. Red screen indicates a compilation or linking error, check the output of the program if you see it. |
-| <kbd>SPACE</kbd>         | Pause/unpause the time uniform variable in shaders                                                                                                                        |
-| <kbd>←</kbd><kbd>→</kbd> | In pause mode step back/forth in time.                                                                                                                                    |
+## How to build
 
-## Uniforms
+```sh
+# build
+$ cd build
+$ make ..
 
-| Name         | Type    | Description                                                                          |
-|--------------|---------|--------------------------------------------------------------------------------------|
-| `resolution` | `vec2`  | Current resolution of the screen in pixels                                           |
-| `time`       | `float` | Amount of time passed since the beginning of the application when it was not paused. |
-| `mouse`      | `vec2`  | Position of the mouse on the screen in pixels                                        |
+# run
+$ ./sco-op
+```
+
+## Attribution
+
+|       Name       | Path |             Author             |
+|------------------|------|--------------------------------|
+| Project template |      | [Tsoding](https://tsoding.org) |

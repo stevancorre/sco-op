@@ -1,4 +1,3 @@
-main
-Dependencies
-*.exe
-*.obj
+build/*
+!.gitkeep
+!shaders
