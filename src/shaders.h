@@ -1,8 +1,7 @@
 #ifndef SHADERS_H_
 #define SHADERS_H_
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "vertex.h"
 
 #include "slurp_file.h"
 
