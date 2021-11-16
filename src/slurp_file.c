@@ -4,7 +4,7 @@ void panic(bool condition, const char *file_path)
 {
     if (condition)
     {
-        fprintf(stderr, "Could not read file `%s`: %s\n", file_path, strerror(errno));
+        fprintf(stderr, "ERROR:\tcould not read file `%s`: %s\n", file_path, strerror(errno));
         exit(1);
     }
 }

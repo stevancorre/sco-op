@@ -1,5 +1,8 @@
 #include "game.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -104,7 +107,7 @@ int main()
         (Vertex){
             .position = {0.5, 0.5, 0},
             .color = {1, 1, 0},
-            .texcoord = {0, 0}},
+            .texcoord = {1, 1}},
     };
     GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
 
@@ -156,6 +159,40 @@ int main()
     // bind vao
     glBindVertexArray(vao);
 
+    // texture unit
+    int image_width = 0;
+    int image_height = 0;
+    stbi_uc* image = stbi_load("assets/64x64.png", &image_width, &image_height, NULL, 4);
+    if(image == NULL)
+    {
+        fprintf(stderr, "ERROR:\tcould not load `assets/64x64.png`: %s\n", strerror(errno));
+        exit(1);
+    }
+
+    // generate the texId and bind it
+    GLuint texture0;
+    glGenTextures(1, &texture0);
+    glBindTexture(GL_TEXTURE_2D, texture0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // when we MAGnify the tex (gets bigger)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // when we MINify the tex (gets smaller)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // generate a texture by giving its type (tex2d), its format, its size, its border and then its data
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    
+    // mimap are like bigger and smaller versions of the texture
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // mark the texture as active, bind it as a tex2d and free the pixel data
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(image);
+
     //* END TEST
 
     while (!glfwWindowShouldClose(game.window))
@@ -174,6 +211,13 @@ int main()
         // use program
         glUseProgram(program);
 
+        // update uniform
+        glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+
+        // activate texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture0);
+
         // bind vao
         glBindVertexArray(vao);
 
@@ -183,6 +227,12 @@ int main()
         // end draw
         glfwSwapBuffers(game.window);
         glFlush();
+
+        // unbind everything
+        glBindVertexArray(0);
+        glUseProgram(0);
+        glActiveTexture(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     // end program
