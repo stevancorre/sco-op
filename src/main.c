@@ -111,7 +111,7 @@ int main()
     };
     GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
 
-    GLuint indicies[] = {0,1,2,0,2,3};
+    GLuint indicies[] = {0, 1, 2, 0, 2, 3};
     GLuint indiciesCount = sizeof(indicies) / sizeof(GLuint);
 
     // generate vao and bind it
@@ -137,7 +137,7 @@ int main()
     GLuint ebo;
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);  
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
 
     // set vertex attributes pointers and enable
     // they correspond to the `layout(location = n)` things in the shaders
@@ -145,15 +145,15 @@ int main()
     // basically data-indexing
 
     // color
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
     glEnableVertexAttribArray(0);
 
     // position
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, color));
     glEnableVertexAttribArray(1);
 
     // texcood
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texcoord));
     glEnableVertexAttribArray(2);
 
     // bind vao
@@ -162,8 +162,8 @@ int main()
     // texture unit
     int image_width = 0;
     int image_height = 0;
-    stbi_uc* image = stbi_load("assets/64x64.png", &image_width, &image_height, NULL, 4);
-    if(image == NULL)
+    stbi_uc *image = stbi_load("assets/64x64.png", &image_width, &image_height, NULL, 4);
+    if (image == NULL)
     {
         fprintf(stderr, "ERROR:\tcould not load `assets/64x64.png`: %s\n", strerror(errno));
         exit(1);
@@ -184,7 +184,7 @@ int main()
 
     // generate a texture by giving its type (tex2d), its format, its size, its border and then its data
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-    
+
     // mimap are like bigger and smaller versions of the texture
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -192,6 +192,23 @@ int main()
     glActiveTexture(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(image);
+
+    // model matrix
+    mat4 model_matrix = GLM_MAT4_IDENTITY_INIT;
+    // move
+    glm_translate(model_matrix, GLM_VEC3_ZERO);
+    // rotate
+    glm_rotate(model_matrix, glm_rad(60), (vec3){1.f, 0.f, 0.f});
+    // scale
+    glm_scale(model_matrix, GLM_VEC3_ONE);
+
+    // apply the matrix
+    // bind program
+    glUseProgram(program);
+    // send data
+    glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)model_matrix);
+    // unbind
+    glUseProgram(0);
 
     //* END TEST
 
@@ -211,8 +228,11 @@ int main()
         // use program
         glUseProgram(program);
 
-        // update uniform
+        // update uniforms
+        // texture
         glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+        // position, rotation and scale
+        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)model_matrix);
 
         // activate texture
         glActiveTexture(GL_TEXTURE0);

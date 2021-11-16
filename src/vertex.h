@@ -8,7 +8,7 @@
 typedef struct Vertex {
     vec3 position;
     vec3 color;
-    vec3 texcoord;
+    vec2 texcoord;
 } Vertex;
 
 #endif // VERTEX_H_
