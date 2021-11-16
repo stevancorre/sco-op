@@ -41,7 +41,7 @@ void frame_buffer_resize_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void init_window(GLFWwindow **window)
+void init_window(GLFWwindow **window, int* frame_buffer_width, int* frame_buffer_height)
 {
     // initialize window
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -55,7 +55,8 @@ void init_window(GLFWwindow **window)
         fprintf(stderr, "ERROR:\tcould not create a window\n");
         terminate_program(1);
     }
-
+    
+    glfwGetFramebufferSize(*window, frame_buffer_width, frame_buffer_height);
     glfwSetFramebufferSizeCallback(*window, frame_buffer_resize_callback);
 
     // initialize context
@@ -81,10 +82,12 @@ int main()
 {
     Game game;
     GLuint program;
+    int frame_buffer_width = 0;
+    int frame_buffer_height = 0;
 
     // initialization
     init_glfw();
-    init_window(&game.window);
+    init_window(&game.window, &frame_buffer_width, &frame_buffer_height);
     init_glew();
     init_gl();
 
@@ -198,16 +201,25 @@ int main()
     // move
     glm_translate(model_matrix, GLM_VEC3_ZERO);
     // rotate
-    glm_rotate(model_matrix, glm_rad(60), (vec3){1.f, 0.f, 0.f});
+    glm_rotate(model_matrix, glm_rad(0), GLM_VEC3_RIGHT);
     // scale
     glm_scale(model_matrix, GLM_VEC3_ONE);
 
-    // apply the matrix
-    // bind program
+    // view matrix
+    mat4 view_matrix = GLM_MAT4_IDENTITY_INIT;
+    vec3 camPosition = GLM_VEC3_FORWARD_INIT;
+    
+    vec3 center;
+    glm_vec3_add(camPosition, GLM_VEC3_BACK, center);
+    glm_lookat(camPosition, center, GLM_VEC3_UP, view_matrix);
+
+    // projection matrix
+    float fov = 90.0f;
+    float nearPlane = 0.1f;
+    float farPlane = 1000.0f;
+
     glUseProgram(program);
-    // send data
-    glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)model_matrix);
-    // unbind
+    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, (float *)view_matrix);
     glUseProgram(0);
 
     //* END TEST
@@ -231,8 +243,15 @@ int main()
         // update uniforms
         // texture
         glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+
         // position, rotation and scale
+        glm_rotate(model_matrix, glm_rad(0.4f), GLM_VEC3_UP);
         glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)model_matrix);
+    
+        mat4 projection_matrix = GLM_MAT4_IDENTITY_INIT;
+        glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
+        glm_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane, projection_matrix);
+        glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, (float *)projection_matrix);
 
         // activate texture
         glActiveTexture(GL_TEXTURE0);
