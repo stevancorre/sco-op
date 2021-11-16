@@ -81,6 +81,7 @@ void init_gl()
 int main()
 {
     Game game;
+
     GLuint program;
     int frame_buffer_width = 0;
     int frame_buffer_height = 0;
@@ -90,6 +91,8 @@ int main()
     init_window(&game.window, &frame_buffer_width, &frame_buffer_height);
     init_glew();
     init_gl();
+
+    player_init(&game.player);
 
     load_shader_program("shaders/vertex_core.glsl", "shaders/fragment_core.glsl", &program);
 
@@ -196,15 +199,6 @@ int main()
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(image);
 
-    // model matrix
-    mat4 model_matrix = GLM_MAT4_IDENTITY_INIT;
-    // move
-    glm_translate(model_matrix, GLM_VEC3_ZERO);
-    // rotate
-    glm_rotate(model_matrix, glm_rad(0), GLM_VEC3_RIGHT);
-    // scale
-    glm_scale(model_matrix, GLM_VEC3_ONE);
-
     // view matrix
     mat4 view_matrix = GLM_MAT4_IDENTITY_INIT;
     vec3 camPosition = GLM_VEC3_FORWARD_INIT;
@@ -230,7 +224,7 @@ int main()
         glfwPollEvents();
 
         //* update
-        game_update_input(game);
+        game_update_input(&game);
 
         //* draw
         // clear
@@ -245,8 +239,10 @@ int main()
         glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
         // position, rotation and scale
-        glm_rotate(model_matrix, glm_rad(0.4f), GLM_VEC3_UP);
-        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)model_matrix);
+        player_update_matrix(&game.player);
+        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float*)game.player.matrix.raw);
+        // glm_rotate(model_matrix, glm_rad(0.4f), GLM_VEC3_UP);
+        // glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)model_matrix);
     
         mat4 projection_matrix = GLM_MAT4_IDENTITY_INIT;
         glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
