@@ -90,7 +90,7 @@ int main()
     //* BEGIN TEST
     Vertex vertices[] = {
         (Vertex){
-            .position = {0, 0.5, 0},
+            .position = {-0.5, 0.5, 0},
             .color = {1, 0, 0},
             .texcoord = {0, 1}},
         (Vertex){
@@ -101,10 +101,14 @@ int main()
             .position = {0.5, -0.5, 0},
             .color = {0, 0, 1},
             .texcoord = {1, 0}},
+        (Vertex){
+            .position = {0.5, 0.5, 0},
+            .color = {1, 1, 0},
+            .texcoord = {0, 0}},
     };
     GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
 
-    GLuint indicies[] = {0, 1, 2};
+    GLuint indicies[] = {0,1,2,0,2,3};
     GLuint indiciesCount = sizeof(indicies) / sizeof(GLuint);
 
     // generate vao and bind it
