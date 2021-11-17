@@ -30,7 +30,7 @@ bool compile_shader_source(const GLchar *source, GLenum shader_type, GLuint *sha
         GLsizei message_size = 0;
 
         glGetShaderInfoLog(*shader, sizeof(message), &message_size, message);
-        
+
         fprintf(stderr, "ERROR: could not compile %s\n", shader_type_as_cstr(shader_type));
         fprintf(stderr, "%.*s\n", message_size, message);
         return false;
@@ -44,7 +44,7 @@ bool compile_shader_file(const char *file_path, GLenum shader_type, GLuint *shad
     // load the source from the specified path, then compile it
     char *source = slurp_file(file_path);
     bool ok = compile_shader_source(source, shader_type, shader);
-    
+
     // if the compilation fails, print it to stderr
     if (!ok)
     {

@@ -41,7 +41,7 @@ void frame_buffer_resize_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void init_window(GLFWwindow **window, int* frame_buffer_width, int* frame_buffer_height)
+void init_window(GLFWwindow **window, int *frame_buffer_width, int *frame_buffer_height)
 {
     // initialize window
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -55,7 +55,7 @@ void init_window(GLFWwindow **window, int* frame_buffer_width, int* frame_buffer
         fprintf(stderr, "ERROR:\tcould not create a window\n");
         terminate_program(1);
     }
-    
+
     glfwGetFramebufferSize(*window, frame_buffer_width, frame_buffer_height);
     glfwSetFramebufferSizeCallback(*window, frame_buffer_resize_callback);
 
@@ -201,8 +201,9 @@ int main()
 
     // view matrix
     vec3s camPosition = GLMS_VEC3_FORWARD_INIT;
-    mat4s view_matrix = glms_lookat(camPosition, glms_vec3_add(camPosition, GLMS_VEC3_BACK), GLMS_VEC3_UP);;
-    
+    mat4s view_matrix = glms_lookat(camPosition, glms_vec3_add(camPosition, GLMS_VEC3_BACK), GLMS_VEC3_UP);
+    ;
+
     // projection matrix
     float fov = 90.0f;
     float nearPlane = 0.1f;
@@ -211,7 +212,7 @@ int main()
 
     glUseProgram(program);
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, (float*)view_matrix.raw);
+    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, (float *)view_matrix.raw);
 
     glUseProgram(0);
 
@@ -239,8 +240,8 @@ int main()
 
         // position, rotation and scale
         player_update_matrix(&game.player);
-        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float*)game.player.matrix.raw);
-    
+        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)game.player.matrix.raw);
+
         glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
         projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
         glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, (float *)projection_matrix.raw);
