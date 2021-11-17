@@ -3,9 +3,8 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <cglm/cglm.h>
+#include <cglm/struct.h>
 
-#include "vertex.h"
 #include "cglm_ext.h"
 #include "slurp_file.h"
 

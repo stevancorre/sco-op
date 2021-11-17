@@ -1,9 +1,8 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-#include "material.h"
+#include "mesh.h"
 #include "player.h"
-#include "texture.h"
 
 typedef struct Game
 {

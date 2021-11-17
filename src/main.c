@@ -107,7 +107,7 @@ int main()
             .position = {{-0.5, -0.5, 0}},
             .color = {{0, 1, 0}},
             .texcoord = {{0, 0}},
-            .normal = {{0, 0, -1}}},
+            .normal = {{0, 0, 1}}},
         (Vertex){
             .position = {{0.5, -0.5, 0}},
             .color = {{0, 0, 1}},
@@ -119,10 +119,10 @@ int main()
             .texcoord = {{1, 1}},
             .normal = {{0, 0, -1}}},
     };
-    //GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
+    GLuint vertex_count = sizeof(vertices) / sizeof(Vertex);
 
-    GLuint indicies[] = {0, 1, 2, 0, 2, 3};
-    GLuint indiciesCount = sizeof(indicies) / sizeof(GLuint);
+    GLuint indices[] = {0, 1, 2, 0, 2, 3};
+    GLuint index_count = sizeof(indices) / sizeof(GLuint);
 
     // generate vao and bind it
     // vao stands for Vertex Array Object
@@ -147,7 +147,7 @@ int main()
     GLuint ebo;
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // set vertex attributes pointers and enable
     // they correspond to the `layout(location = n)` things in the shaders
@@ -168,7 +168,7 @@ int main()
     glEnableVertexAttribArray(3);
 
     // bind vao
-    glBindVertexArray(vao);
+    // glBindVertexArray(vao);
 
     // texture
     Texture texture0 = texture_load("assets/64x64.png", GL_TEXTURE_2D, GL_TEXTURE0);
@@ -181,6 +181,9 @@ int main()
         .diffuse_texture_id = texture0.id,
         .specular_texture_id = texture0.id,
     };
+
+    // mesh
+    Mesh mesh = mesh_init(vertices, vertex_count, indices, index_count);
 
     // view matrix
     vec3s camera_position = GLMS_VEC3_FORWARD_INIT;
@@ -198,9 +201,9 @@ int main()
 
     // initialize uniforms
     program_use(program);
-    
+
     material_send_to_program(material0, program);
-   
+
     program_set_mat4fv(program, "model", game.player.matrix, GL_FALSE);
     program_set_mat4fv(program, "view_matrix", view_matrix, GL_FALSE);
     program_set_mat4fv(program, "projection_matrix", projection_matrix, GL_FALSE);
@@ -245,11 +248,13 @@ int main()
         // to avoid bind/unbind each time
         texture_bind(texture0);
 
-        // bind vao
         glBindVertexArray(vao);
 
         // draw
-        glDrawElements(GL_TRIANGLES, indiciesCount, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+
+        // render mesh
+        mesh_render(&mesh, program);
 
         // end draw
         glfwSwapBuffers(game.window);
@@ -268,4 +273,14 @@ int main()
     glDeleteProgram(program);
 
     return 0;
+}
+
+void mesh_delete(Mesh *mesh)
+{
+    glDeleteVertexArrays(1, &mesh->vertex_array_object);
+    glDeleteBuffers(1, &mesh->vertex_buffer_object);
+    glDeleteBuffers(1, &mesh->element_buffer_object);
+
+    free(mesh->indices);
+    free(mesh->vertices);
 }
