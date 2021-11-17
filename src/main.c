@@ -102,7 +102,7 @@ int main()
             .position = {{-0.5, 0.5, 0}},
             .color = {{1, 0, 0}},
             .texcoord = {{0, 1}},
-            .normal = {{0, 0, -1}}},
+            .normal = {{0, 0, 1}}},
         (Vertex){
             .position = {{-0.5, -0.5, 0}},
             .color = {{0, 1, 0}},
@@ -112,12 +112,12 @@ int main()
             .position = {{0.5, -0.5, 0}},
             .color = {{0, 0, 1}},
             .texcoord = {{1, 0}},
-            .normal = {{0, 0, -1}}},
+            .normal = {{0, 0, 1}}},
         (Vertex){
             .position = {{0.5, 0.5, 0}},
             .color = {{1, 1, 0}},
             .texcoord = {{1, 1}},
-            .normal = {{0, 0, -1}}},
+            .normal = {{0, 0, 1}}},
     };
     GLuint vertex_count = sizeof(vertices) / sizeof(Vertex);
 

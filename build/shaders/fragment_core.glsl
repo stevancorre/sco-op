@@ -28,15 +28,15 @@ void main()
     vec4 ambient_color = vec4(material.ambient, 1.f);
 
     // diffuse color
-    vec3 position_to_light_direction = normalize(vs_position - light_position);
+    vec3 position_to_light_direction = normalize(light_position - vs_position);
     float diffuse = clamp(dot(position_to_light_direction, vs_normal), 0, 1);
     
     vec4 diffuse_color = vec4(material.diffuse * diffuse, 1.f);
 
     // specular color
-    vec3 light_to_position_direction = normalize(light_position - vs_position);
+    vec3 light_to_position_direction = normalize(vs_position - light_position);
     vec3 light_reflection_direction = normalize(reflect(light_to_position_direction, normalize(vs_normal)));
-    vec3 position_to_view_direction = normalize(vs_position - camera_position);
+    vec3 position_to_view_direction = normalize(camera_position - vs_position);
     
     float specular_constant = pow(max(dot(position_to_view_direction, light_reflection_direction), 0), 35);
     vec4 specular_color = vec4(material.specular * specular_constant, 1.f);
