@@ -170,8 +170,17 @@ int main()
     // bind vao
     glBindVertexArray(vao);
 
-    // texture unit
+    // texture
     Texture texture0 = texture_load("assets/64x64.png", GL_TEXTURE_2D, GL_TEXTURE0);
+
+    // material
+    Material material0 = {
+        .ambient = {{0.1f, 0.1f, 0.1f}},
+        .diffuse = GLMS_VEC3_ONE_INIT,
+        .specular = GLMS_VEC3_ONE_INIT,
+        .diffuse_texture_id = texture0.id,
+        .specular_texture_id = texture0.id,
+    };
 
     // view matrix
     vec3s camera_position = GLMS_VEC3_FORWARD_INIT;
@@ -190,6 +199,8 @@ int main()
     // initialize uniforms
     program_use(program);
     
+    material_send_to_program(material0, program);
+   
     program_set_mat4fv(program, "model", game.player.matrix, GL_FALSE);
     program_set_mat4fv(program, "view_matrix", view_matrix, GL_FALSE);
     program_set_mat4fv(program, "projection_matrix", projection_matrix, GL_FALSE);
@@ -219,7 +230,7 @@ int main()
 
         // update uniforms
         // texture
-        program_set_1i(program, "texture0", 0);
+        //program_set_1i(program, "texture0", 0);
 
         // position, rotation and scale
         player_update_matrix(&game.player);
@@ -230,6 +241,8 @@ int main()
         program_set_mat4fv(program, "projection_matrix", projection_matrix, GL_FALSE);
 
         // activate texture
+        // we still need to do that atm, i'll move it a separate function
+        // to avoid bind/unbind each time
         texture_bind(texture0);
 
         // bind vao
