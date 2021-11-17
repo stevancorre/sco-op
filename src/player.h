@@ -3,6 +3,7 @@
 
 #include <GLFW/glfw3.h>
 #include <cglm/struct.h>
+#include "cglm_ext.h"
 
 typedef struct Player
 {

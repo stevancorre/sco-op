@@ -28,9 +28,9 @@ void player_update_matrix(Player* player)
     player->matrix = glms_translate(player->matrix, player->position);
 
     // rotation
-    player->matrix = glms_rotate(player->matrix, glm_rad(player->rotation.x), GLMS_XUP);
-    player->matrix = glms_rotate(player->matrix, glm_rad(player->rotation.y), GLMS_YUP);
-    player->matrix = glms_rotate(player->matrix, glm_rad(player->rotation.z), GLMS_ZUP);
+    player->matrix = glms_rotate(player->matrix, glm_rad(player->rotation.x), GLMS_VEC3_X);
+    player->matrix = glms_rotate(player->matrix, glm_rad(player->rotation.y), GLMS_VEC3_Y);
+    player->matrix = glms_rotate(player->matrix, glm_rad(player->rotation.z), GLMS_VEC3_Z);
 
     // scale
     player->matrix = glms_scale(player->matrix, player->scale);

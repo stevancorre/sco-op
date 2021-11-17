@@ -99,21 +99,21 @@ int main()
     //* BEGIN TEST
     Vertex vertices[] = {
         (Vertex){
-            .position = {-0.5, 0.5, 0},
-            .color = {1, 0, 0},
-            .texcoord = {0, 1}},
+            .position = {{-0.5, 0.5, 0}},
+            .color = {{1, 0, 0}},
+            .texcoord = {{0, 1}}},
         (Vertex){
-            .position = {-0.5, -0.5, 0},
-            .color = {0, 1, 0},
-            .texcoord = {0, 0}},
+            .position = {{-0.5, -0.5, 0}},
+            .color = {{0, 1, 0}},
+            .texcoord = {{0, 0}}},
         (Vertex){
-            .position = {0.5, -0.5, 0},
-            .color = {0, 0, 1},
-            .texcoord = {1, 0}},
+            .position = {{0.5, -0.5, 0}},
+            .color = {{0, 0, 1}},
+            .texcoord = {{1, 0}}},
         (Vertex){
-            .position = {0.5, 0.5, 0},
-            .color = {1, 1, 0},
-            .texcoord = {1, 1}},
+            .position = {{0.5, 0.5, 0}},
+            .color = {{1, 1, 0}},
+            .texcoord = {{1, 1}}},
     };
     GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
 
@@ -200,20 +200,19 @@ int main()
     stbi_image_free(image);
 
     // view matrix
-    mat4 view_matrix = GLM_MAT4_IDENTITY_INIT;
-    vec3 camPosition = GLM_VEC3_FORWARD_INIT;
+    vec3s camPosition = GLMS_VEC3_FORWARD_INIT;
+    mat4s view_matrix = glms_lookat(camPosition, glms_vec3_add(camPosition, GLMS_VEC3_BACK), GLMS_VEC3_UP);;
     
-    vec3 center;
-    glm_vec3_add(camPosition, GLM_VEC3_BACK, center);
-    glm_lookat(camPosition, center, GLM_VEC3_UP, view_matrix);
-
     // projection matrix
     float fov = 90.0f;
     float nearPlane = 0.1f;
     float farPlane = 1000.0f;
+    mat4s projection_matrix;
 
     glUseProgram(program);
-    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, (float *)view_matrix);
+
+    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, (float*)view_matrix.raw);
+
     glUseProgram(0);
 
     //* END TEST
@@ -241,13 +240,10 @@ int main()
         // position, rotation and scale
         player_update_matrix(&game.player);
         glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float*)game.player.matrix.raw);
-        // glm_rotate(model_matrix, glm_rad(0.4f), GLM_VEC3_UP);
-        // glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)model_matrix);
     
-        mat4 projection_matrix = GLM_MAT4_IDENTITY_INIT;
         glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
-        glm_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane, projection_matrix);
-        glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, (float *)projection_matrix);
+        projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
+        glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, (float *)projection_matrix.raw);
 
         // activate texture
         glActiveTexture(GL_TEXTURE0);
