@@ -190,13 +190,13 @@ int main()
     // initialize uniforms
     glUseProgram(program);
     
-    glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(game.player.matrix));
-    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(view_matrix));
-    glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(projection_matrix));
+    glUniformMatrix4fv(UNIFORM_MAT("model_matrix", game.player.matrix, GL_FALSE));
+    glUniformMatrix4fv(UNIFORM_MAT("view_matrix", view_matrix, GL_FALSE));
+    glUniformMatrix4fv(UNIFORM_MAT("projection_matrix", projection_matrix, GL_FALSE));
 
-    glUniform3fv(glGetUniformLocation(program, "light_position"), 1, GLMS_VALUE_PTR(light_position));
-    glUniform3fv(glGetUniformLocation(program, "camera_position"), 1, GLMS_VALUE_PTR(camera_position));
-
+    glUniform3fv(UNIFORM_VEC("light_position", light_position));
+    glUniform3fv(UNIFORM_VEC("camera_position", camera_position));
+    
     glUseProgram(0);
 
     //* END TEST
@@ -219,15 +219,15 @@ int main()
 
         // update uniforms
         // texture
-        glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+        glUniform1i(UNIFORM_INT("texture0", 0));
 
         // position, rotation and scale
         player_update_matrix(&game.player);
-        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(game.player.matrix));
+        glUniformMatrix4fv(UNIFORM_MAT("model_matrix", game.player.matrix, GL_FALSE));
 
         glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
         projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
-        glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(projection_matrix));
+        glUniformMatrix4fv(UNIFORM_MAT("projection_matrix", projection_matrix, GL_FALSE));
 
         // activate texture
         texture_bind(texture0);

@@ -9,6 +9,10 @@
 #include "cglm_ext.h"
 #include "slurp_file.h"
 
+#define UNIFORM_INT(name, value) glGetUniformLocation(program, name), value
+#define UNIFORM_VEC(name, value) glGetUniformLocation(program, name), 1, GLMS_VALUE_PTR(value)
+#define UNIFORM_MAT(name, value, transpose) glGetUniformLocation(program, name), 1, transpose, GLMS_VALUE_PTR(value)
+
 typedef GLuint Shader;
 typedef GLuint Program;
 
