@@ -1,9 +1,16 @@
 #ifndef SHADERS_H_
 #define SHADERS_H_
 
-#include "vertex.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <cglm/cglm.h>
 
+#include "vertex.h"
+#include "cglm_ext.h"
 #include "slurp_file.h"
+
+typedef GLuint Shader;
+typedef GLuint Program;
 
 /**
  * @brief Gets the specified shader's type as a C string
@@ -11,7 +18,7 @@
  * @param shader The target shader
  * @return The shader's type. Either `fragment`, `vertex` or `unknown`
  */
-const char *shader_type_as_cstr(GLuint shader);
+const GLchar *shader_type_as_cstr(Shader shader);
 
 /**
  * @brief Compiles a shader from its source
@@ -21,7 +28,7 @@ const char *shader_type_as_cstr(GLuint shader);
  * @param shader The shader's id
  * @return `true` if the compilation was a success. Otherwise `false`
  */
-bool compile_shader_source(const GLchar *source, GLenum shader_type, GLuint *shader);
+bool shader_compile_source(Shader *shader, const GLchar *source, GLenum shader_type);
 
 /**
  * @brief Compiles a shaders from a file
@@ -31,7 +38,7 @@ bool compile_shader_source(const GLchar *source, GLenum shader_type, GLuint *sha
  * @param shader The shader's id
  * @return `true` if the compilation was a success. Otherwise `false`
  */
-bool compile_shader_file(const char *file_path, GLenum shader_type, GLuint *shader);
+bool shader_compile_source_file(Shader *shader, const GLchar *file_path, GLenum shader_type);
 
 /**
  * @brief Attaches the shaders to the program then links it
@@ -41,7 +48,7 @@ bool compile_shader_file(const char *file_path, GLenum shader_type, GLuint *shad
  * @param program The program id
  * @return `true` if the linking was a success. Otherwise `false`
  */
-bool link_program(GLuint vertex_shader, GLuint fragment_shader, GLuint *program);
+bool shader_link_program(Program *program, Shader vertex_shader, Shader fragment_shader);
 
 /**
  * @brief Loads a shader program
@@ -51,6 +58,6 @@ bool link_program(GLuint vertex_shader, GLuint fragment_shader, GLuint *program)
  * @param program The program id
  * @return `true` if the loading was a success. Otherwise `false` 
  */
-bool load_shader_program(const char *vertex_shader_file_path, const char *fragment_shader_file_path, GLuint *program);
+bool shader_load_program(Program *program, const GLchar *vertex_shader_file_path, const GLchar *fragment_shader_file_path);
 
 #endif // SHADERS_H_

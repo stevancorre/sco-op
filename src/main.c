@@ -82,7 +82,7 @@ int main()
 {
     Game game;
 
-    GLuint program;
+    Program program;
     int frame_buffer_width = 0;
     int frame_buffer_height = 0;
 
@@ -94,7 +94,7 @@ int main()
 
     player_init(&game.player);
 
-    load_shader_program("shaders/vertex_core.glsl", "shaders/fragment_core.glsl", &program);
+    shader_load_program(&program, "shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
 
     //* BEGIN TEST
     Vertex vertices[] = {
@@ -119,7 +119,7 @@ int main()
             .texcoord = {{1, 1}},
             .normal = {{0, 0, -1}}},
     };
-    GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
+    //GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
 
     GLuint indicies[] = {0, 1, 2, 0, 2, 3};
     GLuint indiciesCount = sizeof(indicies) / sizeof(GLuint);

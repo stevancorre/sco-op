@@ -1,7 +1,7 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-#include "shaders.h"
+#include "shader.h"
 #include "player.h"
 
 typedef struct Game

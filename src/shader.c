@@ -1,6 +1,6 @@
-#include "shaders.h"
+#include "shader.h"
 
-const char *shader_type_as_cstr(GLuint shader)
+const GLchar *shader_type_as_cstr(Shader shader)
 {
     switch (shader)
     {
@@ -13,7 +13,7 @@ const char *shader_type_as_cstr(GLuint shader)
     }
 }
 
-bool compile_shader_source(const GLchar *source, GLenum shader_type, GLuint *shader)
+bool shader_compile_source(Shader *shader, const GLchar *source, GLenum shader_type)
 {
     // try to compile the shader
     *shader = glCreateShader(shader_type);
@@ -39,11 +39,11 @@ bool compile_shader_source(const GLchar *source, GLenum shader_type, GLuint *sha
     return true;
 }
 
-bool compile_shader_file(const char *file_path, GLenum shader_type, GLuint *shader)
+bool shader_compile_source_file(Shader *shader, const GLchar *file_path, GLenum shader_type)
 {
     // load the source from the specified path, then compile it
     char *source = slurp_file(file_path);
-    bool ok = compile_shader_source(source, shader_type, shader);
+    bool ok = shader_compile_source(shader, source, shader_type);
 
     // if the compilation fails, print it to stderr
     if (!ok)
@@ -55,13 +55,13 @@ bool compile_shader_file(const char *file_path, GLenum shader_type, GLuint *shad
     return ok;
 }
 
-bool link_program(GLuint vertex_shader, GLuint fragex_shader, GLuint *program)
+bool shader_link_program(Program *program, Shader vertex_shader, Shader fragment_shader)
 {
     // create, attach the shaders then link the program
     *program = glCreateProgram();
 
     glAttachShader(*program, vertex_shader);
-    glAttachShader(*program, fragex_shader);
+    glAttachShader(*program, fragment_shader);
     glLinkProgram(*program);
 
     GLint linked = 0;
@@ -78,29 +78,29 @@ bool link_program(GLuint vertex_shader, GLuint fragex_shader, GLuint *program)
     }
 
     glDeleteShader(vertex_shader);
-    glDeleteShader(fragex_shader);
+    glDeleteShader(fragment_shader);
 
     return program;
 }
 
-bool load_shader_program(const char *vertex_shader_file_path, const char *fragment_shader_file_path, GLuint *program)
+bool shader_load_program(Program *program, const GLchar *vertex_shader_file_path, const GLchar *fragment_shader_file_path)
 {
     // load the vertex shader
-    GLuint vertex_shader = 0;
-    if (!compile_shader_file(vertex_shader_file_path, GL_VERTEX_SHADER, &vertex_shader))
+    Shader vertex_shader = 0;
+    if (!shader_compile_source_file(&vertex_shader, vertex_shader_file_path, GL_VERTEX_SHADER))
     {
         return false;
     }
 
     // load the fragment shader
-    GLuint fragment_shader = 0;
-    if (!compile_shader_file(fragment_shader_file_path, GL_FRAGMENT_SHADER, &fragment_shader))
+    Shader fragment_shader = 0;
+    if (!shader_compile_source_file(&fragment_shader, fragment_shader_file_path, GL_FRAGMENT_SHADER))
     {
         return false;
     }
 
     // then link the program
-    if (!link_program(vertex_shader, fragment_shader, program))
+    if (!shader_link_program(program, vertex_shader, fragment_shader))
     {
         return false;
     }

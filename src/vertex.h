@@ -1,12 +1,9 @@
 #ifndef VERTEX_H_
 #define VERTEX_H_
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <cglm/cglm.h>
 #include <cglm/struct.h>
 
-typedef struct Vertex
+typedef struct
 {
     vec3s position;
     vec3s color;
