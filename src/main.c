@@ -171,38 +171,7 @@ int main()
     glBindVertexArray(vao);
 
     // texture unit
-    int image_width = 0;
-    int image_height = 0;
-    stbi_uc *image = stbi_load("assets/64x64.png", &image_width, &image_height, NULL, 4);
-    if (image == NULL)
-    {
-        fprintf(stderr, "ERROR:\tcould not load `assets/64x64.png`: %s\n", strerror(errno));
-        exit(1);
-    }
-
-    // generate the texId and bind it
-    GLuint texture0;
-    glGenTextures(1, &texture0);
-    glBindTexture(GL_TEXTURE_2D, texture0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // when we MAGnify the tex (gets bigger)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // when we MINify the tex (gets smaller)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    // generate a texture by giving its type (tex2d), its format, its size, its border and then its data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-
-    // mimap are like bigger and smaller versions of the texture
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // mark the texture as active, bind it as a tex2d and free the pixel data
-    glActiveTexture(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    stbi_image_free(image);
+    Texture texture0 = texture_load("assets/64x64.png", GL_TEXTURE_2D, GL_TEXTURE0);
 
     // view matrix
     vec3s camera_position = GLMS_VEC3_FORWARD_INIT;
@@ -261,8 +230,7 @@ int main()
         glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(projection_matrix));
 
         // activate texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture0);
+        texture_bind(texture0);
 
         // bind vao
         glBindVertexArray(vao);
@@ -277,8 +245,7 @@ int main()
         // unbind everything
         glBindVertexArray(0);
         glUseProgram(0);
-        glActiveTexture(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        texture_unbind(texture0);
     }
 
     // end program

@@ -3,6 +3,7 @@
 
 #include "shader.h"
 #include "player.h"
+#include "texture.h"
 
 typedef struct Game
 {
