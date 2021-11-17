@@ -31,4 +31,6 @@
 #define GLMS_VEC3_Y GLMS_VEC3_UP
 #define GLMS_VEC3_Z GLMS_VEC3_FORWARD
 
+#define GLMS_VALUE_PTR(target) (float *)target.raw
+
 #endif // CGLM_EXT_H_

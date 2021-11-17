@@ -101,19 +101,23 @@ int main()
         (Vertex){
             .position = {{-0.5, 0.5, 0}},
             .color = {{1, 0, 0}},
-            .texcoord = {{0, 1}}},
+            .texcoord = {{0, 1}},
+            .normal = {{0, 0, -1}}},
         (Vertex){
             .position = {{-0.5, -0.5, 0}},
             .color = {{0, 1, 0}},
-            .texcoord = {{0, 0}}},
+            .texcoord = {{0, 0}},
+            .normal = {{0, 0, -1}}},
         (Vertex){
             .position = {{0.5, -0.5, 0}},
             .color = {{0, 0, 1}},
-            .texcoord = {{1, 0}}},
+            .texcoord = {{1, 0}},
+            .normal = {{0, 0, -1}}},
         (Vertex){
             .position = {{0.5, 0.5, 0}},
             .color = {{1, 1, 0}},
-            .texcoord = {{1, 1}}},
+            .texcoord = {{1, 1}},
+            .normal = {{0, 0, -1}}},
     };
     GLuint verticesCount = sizeof(vertices) / sizeof(Vertex);
 
@@ -153,14 +157,15 @@ int main()
     // color
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
     glEnableVertexAttribArray(0);
-
     // position
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, color));
     glEnableVertexAttribArray(1);
-
     // texcood
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texcoord));
     glEnableVertexAttribArray(2);
+    // normal
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(3);
 
     // bind vao
     glBindVertexArray(vao);
@@ -200,19 +205,28 @@ int main()
     stbi_image_free(image);
 
     // view matrix
-    vec3s camPosition = GLMS_VEC3_FORWARD_INIT;
-    mat4s view_matrix = glms_lookat(camPosition, glms_vec3_add(camPosition, GLMS_VEC3_BACK), GLMS_VEC3_UP);
-    ;
+    vec3s camera_position = GLMS_VEC3_FORWARD_INIT;
+    mat4s view_matrix = glms_lookat(camera_position, glms_vec3_add(camera_position, GLMS_VEC3_BACK), GLMS_VEC3_UP);
+
+    // lights
+    vec3s light_position = GLMS_VEC3_FORWARD_INIT;
 
     // projection matrix
     float fov = 90.0f;
     float nearPlane = 0.1f;
     float farPlane = 1000.0f;
-    mat4s projection_matrix;
+    glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
+    mat4s projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
 
+    // initialize uniforms
     glUseProgram(program);
+    
+    glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(game.player.matrix));
+    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(view_matrix));
+    glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(projection_matrix));
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "view_matrix"), 1, GL_FALSE, (float *)view_matrix.raw);
+    glUniform3fv(glGetUniformLocation(program, "light_position"), 1, GLMS_VALUE_PTR(light_position));
+    glUniform3fv(glGetUniformLocation(program, "camera_position"), 1, GLMS_VALUE_PTR(camera_position));
 
     glUseProgram(0);
 
@@ -240,11 +254,11 @@ int main()
 
         // position, rotation and scale
         player_update_matrix(&game.player);
-        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, (float *)game.player.matrix.raw);
+        glUniformMatrix4fv(glGetUniformLocation(program, "model_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(game.player.matrix));
 
         glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
         projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
-        glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, (float *)projection_matrix.raw);
+        glUniformMatrix4fv(glGetUniformLocation(program, "projection_matrix"), 1, GL_FALSE, GLMS_VALUE_PTR(projection_matrix));
 
         // activate texture
         glActiveTexture(GL_TEXTURE0);

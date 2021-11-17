@@ -11,6 +11,7 @@ typedef struct Vertex
     vec3s position;
     vec3s color;
     vec2s texcoord;
+    vec3s normal;
 } Vertex;
 
 #endif // VERTEX_H_
