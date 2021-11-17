@@ -94,7 +94,7 @@ int main()
 
     player_init(&game.player);
 
-    shader_load_program(&program, "shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
+    program_load_shaders(&program, "shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
 
     //* BEGIN TEST
     Vertex vertices[] = {
@@ -188,16 +188,16 @@ int main()
     mat4s projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
 
     // initialize uniforms
-    glUseProgram(program);
+    program_use(program);
     
-    glUniformMatrix4fv(UNIFORM_MAT("model_matrix", game.player.matrix, GL_FALSE));
-    glUniformMatrix4fv(UNIFORM_MAT("view_matrix", view_matrix, GL_FALSE));
-    glUniformMatrix4fv(UNIFORM_MAT("projection_matrix", projection_matrix, GL_FALSE));
+    program_set_mat4fv(program, "model", game.player.matrix, GL_FALSE);
+    program_set_mat4fv(program, "view_matrix", view_matrix, GL_FALSE);
+    program_set_mat4fv(program, "projection_matrix", projection_matrix, GL_FALSE);
 
-    glUniform3fv(UNIFORM_VEC("light_position", light_position));
-    glUniform3fv(UNIFORM_VEC("camera_position", camera_position));
-    
-    glUseProgram(0);
+    program_set_vec3fv(program, "light_position", light_position);
+    program_set_vec3fv(program, "camera_position", camera_position);
+
+    program_unuse();
 
     //* END TEST
 
@@ -215,19 +215,19 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // use program
-        glUseProgram(program);
+        program_use(program);
 
         // update uniforms
         // texture
-        glUniform1i(UNIFORM_INT("texture0", 0));
+        program_set_1i(program, "texture0", 0);
 
         // position, rotation and scale
         player_update_matrix(&game.player);
-        glUniformMatrix4fv(UNIFORM_MAT("model_matrix", game.player.matrix, GL_FALSE));
+        program_set_mat4fv(program, "model_matrix", game.player.matrix, GL_FALSE);
 
         glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
         projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
-        glUniformMatrix4fv(UNIFORM_MAT("projection_matrix", projection_matrix, GL_FALSE));
+        program_set_mat4fv(program, "projection_matrix", projection_matrix, GL_FALSE);
 
         // activate texture
         texture_bind(texture0);
@@ -244,7 +244,7 @@ int main()
 
         // unbind everything
         glBindVertexArray(0);
-        glUseProgram(0);
+        program_unuse();
         texture_unbind(texture0);
     }
 
