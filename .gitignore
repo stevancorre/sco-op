@@ -1,4 +1,2 @@
-build/*
-!.gitkeep
-!shaders
+sco-op
 .vscode
