@@ -1,9 +1,9 @@
 #include "mesh.h"
 
-void __mesh_init_vertex_array_object(Mesh *mesh, const Vertex *vertices, const GLuint vertex_count, const Index *indices, const GLuint index_count)
+void __mesh_init_vertex_array_object(Mesh *mesh, const Model model)
 {
-    mesh->vertex_count = vertex_count;
-    mesh->index_count = index_count;
+    mesh->vertex_count = model.vertex_count;
+    mesh->index_count = model.index_count;
 
     // generate vao and bind it
     // vao stands for Vertex Array Object
@@ -18,14 +18,14 @@ void __mesh_init_vertex_array_object(Mesh *mesh, const Vertex *vertices, const G
     // in this case, we should GL_DYNAMIC_DRAW
     glCreateBuffers(1, &mesh->vertex_buffer_object);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer_object);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh->vertex_count, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh->vertex_count, model.vertices, GL_STATIC_DRAW);
 
     // generate ebo, bind and send data
     // ebo stands for element buffer object
     // used for vertices indexing
     glGenBuffers(1, &mesh->element_buffer_object);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->element_buffer_object);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->index_count, indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->index_count, model.indices, GL_STATIC_DRAW);
 
     // set vertex attributes pointers and enable
     // they correspond to the `layout(location = n)` things in the shaders
@@ -79,12 +79,14 @@ void __mesh_init_model_matrix(Mesh *mesh)
     __mesh_update_model_matrix(mesh);
 }
 
-Mesh mesh_init(const Vertex *vertices, const GLuint vertex_count, const Index *indices, const GLuint index_count)
+Mesh mesh_init(const Model model)
 {
     Mesh mesh;
 
-    __mesh_init_vertex_array_object(&mesh, vertices, vertex_count, indices, index_count);
+    __mesh_init_vertex_array_object(&mesh, model);
     __mesh_init_model_matrix(&mesh);
+
+    model_free(model);
 
     return mesh;
 }

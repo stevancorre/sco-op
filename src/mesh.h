@@ -1,12 +1,10 @@
 #ifndef MESH_H_
 #define MESH_H_
 
-#include "vertex.h"
+#include "primitives.h"
 #include "shader.h"
 #include "material.h"
 #include "texture.h"
-
-typedef GLuint Index;
 
 typedef struct
 {
@@ -24,7 +22,7 @@ typedef struct
     mat4s model_matrix;
 } Mesh;
 
-Mesh mesh_init(const Vertex *vertices, const GLuint vertex_count, const Index *indices, const GLuint index_count);
+Mesh mesh_init(const Model model);
 
 void mesh_set_position(Mesh *mesh, const vec3s value);
 

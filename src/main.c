@@ -95,32 +95,6 @@ int main()
     program_load_shaders(&program, "shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
 
     //* BEGIN TEST
-    Vertex vertices[] = {
-        (Vertex){
-            .position = {{-0.5, 0.5, 0}},
-            .color = {{1, 0, 0}},
-            .texcoord = {{0, 1}},
-            .normal = {{0, 0, 1}}},
-        (Vertex){
-            .position = {{-0.5, -0.5, 0}},
-            .color = {{0, 1, 0}},
-            .texcoord = {{0, 0}},
-            .normal = {{0, 0, 1}}},
-        (Vertex){
-            .position = {{0.5, -0.5, 0}},
-            .color = {{0, 0, 1}},
-            .texcoord = {{1, 0}},
-            .normal = {{0, 0, 1}}},
-        (Vertex){
-            .position = {{0.5, 0.5, 0}},
-            .color = {{1, 1, 0}},
-            .texcoord = {{1, 1}},
-            .normal = {{0, 0, 1}}},
-    };
-    GLuint vertex_count = sizeof(vertices) / sizeof(Vertex);
-
-    GLuint indices[] = {0, 1, 2, 0, 2, 3};
-    GLuint index_count = sizeof(indices) / sizeof(GLuint);
 
     // texture
     Texture texture0 = texture_load("assets/64x64.png", GL_TEXTURE_2D, GL_TEXTURE0);
@@ -135,7 +109,8 @@ int main()
     };
 
     // mesh
-    game.player = mesh_init(vertices, vertex_count, indices, index_count);
+    Model quad = model_init_quad();
+    game.player = mesh_init(quad);
 
     // view matrix
     vec3s camera_position = GLMS_VEC3_FORWARD_INIT;
@@ -196,9 +171,6 @@ int main()
         // we still need to do that atm, i'll move it a separate function
         // to avoid bind/unbind each time
         texture_bind(texture0);
-
-        // draw
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
 
         // render mesh
         mesh_render(&game.player, program);
