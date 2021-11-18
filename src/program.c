@@ -53,40 +53,44 @@ bool program_load_shaders(Program *program, const GLchar *vertex_shader_file_pat
     return true;
 }
 
+#define PROGRAM_UNIFORM_LOCATION glGetUniformLocation(program, name)
+
 void program_set_1i(Program program, const GLchar *name, GLint value)
 {
-    glUniform1i(glGetUniformLocation(program, name), value);
+    glUniform1i(PROGRAM_UNIFORM_LOCATION, value);
 }
 
 void program_set_1f(Program program, const GLchar *name, GLfloat value)
 {
-    glUniform1f(glGetUniformLocation(program, name), value);
+    glUniform1f(PROGRAM_UNIFORM_LOCATION, value);
 }
 
 void program_set_vec2fv(Program program, const GLchar *name, vec2s value)
 {
-    glUniform2fv(glGetUniformLocation(program, name), 1, (float *)value.raw);
+    glUniform2fv(PROGRAM_UNIFORM_LOCATION, 1, GLMS_VALUE_PTR(value));
 }
 
 void program_set_vec3fv(Program program, const GLchar *name, vec3s value)
 {
-    glUniform3fv(glGetUniformLocation(program, name), 1, (float *)value.raw);
+    glUniform3fv(PROGRAM_UNIFORM_LOCATION, 1, GLMS_VALUE_PTR(value));
 }
 
 void program_set_vec4fv(Program program, const GLchar *name, vec4s value)
 {
-    glUniform4fv(glGetUniformLocation(program, name), 1, (float *)value.raw);
+    glUniform4fv(PROGRAM_UNIFORM_LOCATION, 1, GLMS_VALUE_PTR(value));
 }
 
 void program_set_mat3fv(Program program, const GLchar *name, mat3s value, GLboolean transpose)
 {
-    glUniformMatrix3fv(glGetUniformLocation(program, name), 1, transpose, (float *)value.raw);
+    glUniformMatrix3fv(PROGRAM_UNIFORM_LOCATION, 1, transpose, GLMS_VALUE_PTR(value));
 }
 
 void program_set_mat4fv(Program program, const GLchar *name, mat4s value, GLboolean transpose)
 {
-    glUniformMatrix4fv(glGetUniformLocation(program, name), 1, transpose, (float *)value.raw);
+    glUniformMatrix4fv(PROGRAM_UNIFORM_LOCATION, 1, transpose, GLMS_VALUE_PTR(value));
 }
+
+#undef PROGRAM_ULOC
 
 void program_use(Program program)
 {
