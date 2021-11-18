@@ -92,8 +92,6 @@ int main()
     init_glew();
     init_gl();
 
-    player_init(&game.player);
-
     program_load_shaders(&program, "shaders/vertex_core.glsl", "shaders/fragment_core.glsl");
 
     //* BEGIN TEST
@@ -124,52 +122,6 @@ int main()
     GLuint indices[] = {0, 1, 2, 0, 2, 3};
     GLuint index_count = sizeof(indices) / sizeof(GLuint);
 
-    // generate vao and bind it
-    // vao stands for Vertex Array Object
-    // it basically holds datas for any renderable object
-    GLuint vao;
-    glCreateVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    // generate vbo, bind and send data
-    // vbo stands for Vertex Buffer Object
-    // its role is to send the vao's data to the GPU
-    // static draw means that we won't edit the size of the object etc
-    // in this case, we should GL_DYNAMIC_DRAW
-    GLuint vbo;
-    glCreateBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // generate ebo, bind and send data
-    // ebo stands for element buffer object
-    // used for vertices indexing
-    GLuint ebo;
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // set vertex attributes pointers and enable
-    // they correspond to the `layout(location = n)` things in the shaders
-    // this is how you sort of layout the data you want to send to the shader
-    // basically data-indexing
-
-    // color
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
-    glEnableVertexAttribArray(0);
-    // position
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, color));
-    glEnableVertexAttribArray(1);
-    // texcood
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texcoord));
-    glEnableVertexAttribArray(2);
-    // normal
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, normal));
-    glEnableVertexAttribArray(3);
-
-    // bind vao
-    // glBindVertexArray(vao);
-
     // texture
     Texture texture0 = texture_load("assets/64x64.png", GL_TEXTURE_2D, GL_TEXTURE0);
 
@@ -183,7 +135,7 @@ int main()
     };
 
     // mesh
-    Mesh mesh = mesh_init(vertices, vertex_count, indices, index_count);
+    game.player = mesh_init(vertices, vertex_count, indices, index_count);
 
     // view matrix
     vec3s camera_position = GLMS_VEC3_FORWARD_INIT;
@@ -204,7 +156,6 @@ int main()
 
     material_send_to_program(material0, program);
 
-    program_set_mat4fv(program, "model", game.player.matrix, GL_FALSE);
     program_set_mat4fv(program, "view_matrix", view_matrix, GL_FALSE);
     program_set_mat4fv(program, "projection_matrix", projection_matrix, GL_FALSE);
 
@@ -236,8 +187,6 @@ int main()
         //program_set_1i(program, "texture0", 0);
 
         // position, rotation and scale
-        player_update_matrix(&game.player);
-        program_set_mat4fv(program, "model_matrix", game.player.matrix, GL_FALSE);
 
         glfwGetFramebufferSize(game.window, &frame_buffer_width, &frame_buffer_height);
         projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
@@ -248,13 +197,11 @@ int main()
         // to avoid bind/unbind each time
         texture_bind(texture0);
 
-        glBindVertexArray(vao);
-
         // draw
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
 
         // render mesh
-        mesh_render(&mesh, program);
+        mesh_render(&game.player, program);
 
         // end draw
         glfwSwapBuffers(game.window);

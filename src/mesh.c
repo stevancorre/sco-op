@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-void __mesh_init_vertex_array_object(Mesh *mesh, Vertex *vertices, const GLuint vertex_count, Index *indices, const GLuint index_count)
+void __mesh_init_vertex_array_object(Mesh *mesh, const Vertex *vertices, const GLuint vertex_count, const Index *indices, const GLuint index_count)
 {
     mesh->vertex_count = vertex_count;
     mesh->index_count = index_count;
@@ -72,9 +72,9 @@ void __mesh_update_model_matrix(Mesh *mesh)
 
 void __mesh_init_model_matrix(Mesh *mesh)
 {
-    mesh->position = GLMS_VEC3_ZERO;
-    mesh->rotation = GLMS_VEC3_ZERO;
-    mesh->scale = GLMS_VEC3_ONE;
+    mesh_set_position(mesh, GLMS_VEC3_ZERO);
+    mesh_set_rotation(mesh, GLMS_VEC3_ZERO);
+    mesh_set_scale(mesh, GLMS_VEC3_ONE);
 
     __mesh_update_model_matrix(mesh);
 }
@@ -96,12 +96,12 @@ void mesh_set_position(Mesh *mesh, const vec3s value)
 
 void mesh_set_rotation(Mesh *mesh, const vec3s value)
 {
-    mesh->position = value;
+    mesh->rotation = value;
 }
 
 void mesh_set_scale(Mesh *mesh, const vec3s value)
 {
-    mesh->position = value;
+    mesh->scale = value;
 }
 
 void mesh_offset_position(Mesh *mesh, const vec3s offset)

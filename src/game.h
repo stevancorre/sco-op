@@ -2,12 +2,11 @@
 #define GAME_H_
 
 #include "mesh.h"
-#include "player.h"
 
 typedef struct Game
 {
     GLFWwindow *window;
-    Player player;
+    Mesh player;
 } Game;
 
 void game_update_input(Game *game);
