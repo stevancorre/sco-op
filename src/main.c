@@ -274,13 +274,3 @@ int main()
 
     return 0;
 }
-
-void mesh_delete(Mesh *mesh)
-{
-    glDeleteVertexArrays(1, &mesh->vertex_array_object);
-    glDeleteBuffers(1, &mesh->vertex_buffer_object);
-    glDeleteBuffers(1, &mesh->element_buffer_object);
-
-    free(mesh->indices);
-    free(mesh->vertices);
-}

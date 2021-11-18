@@ -10,10 +10,7 @@ typedef GLuint Index;
 
 typedef struct
 {
-    Vertex *vertices;
     GLuint vertex_count;
-
-    Index *indices;
     GLuint index_count;
 
     GLuint vertex_array_object;
@@ -27,7 +24,19 @@ typedef struct
     mat4s model_matrix;
 } Mesh;
 
-Mesh mesh_init(Vertex *vertices, const GLuint vertex_count, Index *indices, const GLuint index_count);
+Mesh mesh_init(const Vertex *vertices, const GLuint vertex_count, const Index *indices, const GLuint index_count);
+
+void mesh_set_position(Mesh* mesh, const vec3s value);
+
+void mesh_set_rotation(Mesh* mesh,const vec3s value);
+
+void mesh_set_scale(Mesh* mesh,const vec3s value);
+
+void mesh_offset_position(Mesh* mesh, const vec3s offset);
+
+void mesh_offset_rotation(Mesh* mesh,const vec3s offset);
+
+void mesh_offset_scale(Mesh* mesh,const vec3s offset);
 
 void mesh_update(Mesh *mesh);
 
