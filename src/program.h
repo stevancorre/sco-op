@@ -23,7 +23,7 @@ bool program_link_shader(Program *program, Shader vertex_shader, Shader fragment
  * @param program The program id
  * @return `true` if the loading was a success. Otherwise `false` 
  */
-bool program_load_shaders(Program *program, const GLchar *vertex_shader_file_path, const GLchar *fragment_shader_file_path);
+Program program_load(const GLchar *vertex_shader_file_path, const GLchar *fragment_shader_file_path);
 
 /**
  * @brief Set a specific int uniform value for a program

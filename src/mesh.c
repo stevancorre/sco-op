@@ -49,34 +49,13 @@ void __mesh_init_vertex_array_object(Mesh *mesh, const Model model)
     glBindVertexArray(0);
 }
 
-void __mesh_update_uniforms(const Mesh *mesh, Program program)
-{
-    program_set_mat4fv(program, "model_matrix", mesh->model_matrix, false);
-}
-
-void __mesh_update_model_matrix(Mesh *mesh)
-{
-    mesh->model_matrix = glms_mat4_identity();
-
-    // position
-    mesh->model_matrix = glms_translate(mesh->model_matrix, mesh->position);
-
-    // rotation
-    mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.x), GLMS_VEC3_X);
-    mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.y), GLMS_VEC3_Y);
-    mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.z), GLMS_VEC3_Z);
-
-    // scale
-    mesh->model_matrix = glms_scale(mesh->model_matrix, mesh->scale);
-}
-
 void __mesh_init_model_matrix(Mesh *mesh)
 {
     mesh_set_position(mesh, GLMS_VEC3_ZERO);
     mesh_set_rotation(mesh, GLMS_VEC3_ZERO);
     mesh_set_scale(mesh, GLMS_VEC3_ONE);
 
-    __mesh_update_model_matrix(mesh);
+    mesh_update(mesh);
 }
 
 Mesh mesh_init(const Model model)
@@ -121,18 +100,33 @@ void mesh_offset_scale(Mesh *mesh, const vec3s offset)
     mesh_set_scale(mesh, glms_vec3_add(mesh->scale, offset));
 }
 
-void mesh_render(Mesh *mesh, Program program)
+void mesh_update(Mesh *mesh)
 {
-    __mesh_update_model_matrix(mesh);
-    __mesh_update_uniforms(mesh, program);
+    mesh->model_matrix = glms_mat4_identity();
 
-    program_use(program);
+    // position
+    mesh->model_matrix = glms_translate(mesh->model_matrix, mesh->position);
+
+    // rotation
+    mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.x), GLMS_VEC3_X);
+    mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.y), GLMS_VEC3_Y);
+    mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.z), GLMS_VEC3_Z);
+
+    // scale
+    mesh->model_matrix = glms_scale(mesh->model_matrix, mesh->scale);
+}
+
+void mesh_render(Mesh mesh, Program program)
+{
+    program_set_mat4fv(program, "model_matrix", mesh.model_matrix, false);
 
     // bind vao
-    glBindVertexArray(mesh->vertex_array_object);
+    glBindVertexArray(mesh.vertex_array_object);
 
     // draw
-    glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
 }
 
 void mesh_delete(Mesh *mesh)

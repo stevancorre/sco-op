@@ -28,29 +28,34 @@ bool program_link_shader(Program *program, Shader vertex_shader, Shader fragment
     return program;
 }
 
-bool program_load_shaders(Program *program, const GLchar *vertex_shader_file_path, const GLchar *fragment_shader_file_path)
+Program program_load(const GLchar *vertex_shader_file_path, const GLchar *fragment_shader_file_path)
 {
+    Program program;
+
     // load the vertex shader
     Shader vertex_shader = 0;
     if (!shader_compile_source_file(&vertex_shader, vertex_shader_file_path, GL_VERTEX_SHADER))
     {
-        return false;
+        // TODO: better exit
+        exit(1);
     }
 
     // load the fragment shader
     Shader fragment_shader = 0;
     if (!shader_compile_source_file(&fragment_shader, fragment_shader_file_path, GL_FRAGMENT_SHADER))
     {
-        return false;
+        // TODO: better exit
+        exit(1);
     }
 
     // then link the program
-    if (!program_link_shader(program, vertex_shader, fragment_shader))
+    if (!program_link_shader(&program, vertex_shader, fragment_shader))
     {
-        return false;
+        // TODO: better exit
+        exit(1);
     }
 
-    return true;
+    return program;
 }
 
 #define PROGRAM_UNIFORM_LOCATION glGetUniformLocation(program, name)

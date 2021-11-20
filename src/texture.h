@@ -52,7 +52,7 @@ typedef struct
  * @param type The desired texture type
  * @return The loaded texture, gl-ready
  */
-Texture texture_load(const GLchar* file_path, GLenum type, GLenum texture_unit);
+Texture texture_load(const GLchar *path, GLenum type, GLenum texture_unit);
 
 /**
  * @brief Bind a texture

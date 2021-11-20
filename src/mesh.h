@@ -38,7 +38,7 @@ void mesh_offset_scale(Mesh *mesh, const vec3s offset);
 
 void mesh_update(Mesh *mesh);
 
-void mesh_render(Mesh *mesh, Program program);
+void mesh_render(Mesh mesh, Program program);
 
 void mesh_delete(Mesh *mesh);
 
