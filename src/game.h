@@ -15,7 +15,8 @@ enum SHADERS
 
 enum TEXTURES
 {
-    TEXTURE_64X_PLACEHOLDER = 0
+    TEXTURE_64X_PLACEHOLDER = 0,
+    TEXTURE_IMG_PLACEHOLDER = 1
 };
 
 enum LIGHTS
@@ -25,7 +26,8 @@ enum LIGHTS
 
 enum MESHES
 {
-    MESH_PLAYER = 0
+    MESH_PLAYER = 0,
+    MESH_QUAD = 1,
 };
 
 typedef struct Game
@@ -63,7 +65,7 @@ void game_update_input(Game *game);
 
 void game_update(Game *game);
 
-void game_render(Game game, Program program);
+void game_render(Game game);
 
 void game_exit(Game *game, int code);
 

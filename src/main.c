@@ -12,7 +12,7 @@ int main()
     {
         game_update_input(&game);
         game_update(&game);
-        game_render(game, game.programs[0]);
+        game_render(game);
     }
 
     game_exit(&game, 0);

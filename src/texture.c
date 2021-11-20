@@ -1,6 +1,6 @@
 #include "texture.h"
 
-Texture texture_load(const GLchar *path, GLenum type, GLenum texture_unit)
+Texture texture_load(const GLchar *path, const GLenum type)
 {
     int texture_width = 0;
     int texture_height = 0;
@@ -38,19 +38,18 @@ Texture texture_load(const GLchar *path, GLenum type, GLenum texture_unit)
     return (Texture){
         .id = texture_id,
         .type = type,
-        .texture_unit = texture_unit,
         .width = texture_width,
         .height = texture_height,
     };
 }
 
-void texture_bind(Texture texture)
+void texture_bind(const Texture texture, const GLenum texture_unit)
 {
-    glActiveTexture(texture.texture_unit);
+    glActiveTexture(texture_unit);
     glBindTexture(texture.type, texture.id);
 }
 
-void texture_unbind(Texture texture)
+void texture_unbind(const Texture texture)
 {
     glActiveTexture(0);
     glBindTexture(texture.type, 0);
