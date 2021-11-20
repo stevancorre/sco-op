@@ -32,6 +32,7 @@ typedef struct Game
 {
     GLFWwindow *window;
 
+    // view
     vec3s camera_position;
 
     mat4s projection_matrix;
