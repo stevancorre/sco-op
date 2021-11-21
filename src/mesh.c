@@ -23,9 +23,12 @@ void __mesh_init_vertex_array_object(Mesh *mesh, const Model model)
     // generate ebo, bind and send data
     // ebo stands for element buffer object
     // used for vertices indexing
-    glGenBuffers(1, &mesh->element_buffer_object);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->element_buffer_object);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->index_count, model.indices, GL_STATIC_DRAW);
+    if (mesh->index_count > 0)
+    {
+        glGenBuffers(1, &mesh->element_buffer_object);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->element_buffer_object);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->index_count, model.indices, GL_STATIC_DRAW);
+    }
 
     // set vertex attributes pointers and enable
     // they correspond to the `layout(location = n)` things in the shaders
@@ -124,7 +127,14 @@ void mesh_render(Mesh mesh, Program program)
     glBindVertexArray(mesh.vertex_array_object);
 
     // draw
-    glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+    if (mesh.index_count == 0)
+    {
+        glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count);
+    }
+    else
+    {
+        glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+    }
 
     glBindVertexArray(0);
 }
@@ -133,5 +143,9 @@ void mesh_delete(Mesh *mesh)
 {
     glDeleteVertexArrays(1, &mesh->vertex_array_object);
     glDeleteBuffers(1, &mesh->vertex_buffer_object);
-    glDeleteBuffers(1, &mesh->element_buffer_object);
+
+    if (mesh->index_count > 0)
+    {
+        glDeleteBuffers(1, &mesh->element_buffer_object);
+    }
 }

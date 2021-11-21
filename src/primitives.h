@@ -7,4 +7,6 @@ Model model_init_quad();
 
 Model model_init_triangle();
 
+Model model_init_pyramid();
+
 #endif

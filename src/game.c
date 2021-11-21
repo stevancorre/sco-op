@@ -111,7 +111,7 @@ static void __game_init_materials(Game *game)
 static void __game_init_meshes(Game *game)
 {
     const Mesh meshes[] = {
-        [MESH_PLAYER] = mesh_init(model_init_quad()),
+        [MESH_PLAYER] = mesh_init(model_init_pyramid()),
         [MESH_QUAD] = mesh_init(model_init_quad())};
 
     game->mesh_count = sizeof(meshes) / sizeof(Mesh);
@@ -238,6 +238,14 @@ void game_update_input(Game *game)
     if (glfwGetKey(game->window, GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
         rotation.y += 1.f;
+    }
+    if (glfwGetKey(game->window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        rotation.x -= 1.f;
+    }
+    if (glfwGetKey(game->window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        rotation.x += 1.f;
     }
 
     mesh_offset_position(&game->meshes[MESH_PLAYER], movement);
