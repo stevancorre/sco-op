@@ -111,8 +111,7 @@ static void __game_init_materials(Game *game)
 static void __game_init_meshes(Game *game)
 {
     const Mesh meshes[] = {
-        [MESH_PLAYER] = mesh_init(model_init_pyramid()),
-        [MESH_QUAD] = mesh_init(model_init_quad())};
+        [MESH_PLAYER] = mesh_init(model_init_pyramid())};
 
     game->mesh_count = sizeof(meshes) / sizeof(Mesh);
     game->meshes = (Mesh *)malloc(game->mesh_count * sizeof(Mesh));
@@ -256,7 +255,6 @@ void game_update(Game *game)
 {
     __game_update_camera(game);
     mesh_update(&game->meshes[MESH_PLAYER]);
-    mesh_update(&game->meshes[MESH_QUAD]);
 }
 
 void game_render(Game game)
@@ -279,7 +277,6 @@ void game_render(Game game)
     mesh_render(game.meshes[MESH_PLAYER], game.programs[SHADER_STANDARD]);
 
     texture_bind(game.textures[TEXTURE_IMG_PLACEHOLDER], GL_TEXTURE0);
-    mesh_render(game.meshes[MESH_QUAD], game.programs[SHADER_STANDARD]);
 
     // unbind everything
     program_unuse();

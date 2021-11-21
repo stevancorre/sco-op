@@ -26,8 +26,7 @@ enum LIGHTS
 
 enum MESHES
 {
-    MESH_PLAYER = 0,
-    MESH_QUAD = 1,
+    MESH_PLAYER = 0
 };
 
 enum MATERIALS
