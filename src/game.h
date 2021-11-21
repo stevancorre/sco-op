@@ -30,6 +30,11 @@ enum MESHES
     MESH_QUAD = 1,
 };
 
+enum MATERIALS
+{
+    MATERIAL_STANDARD = 0
+};
+
 typedef struct Game
 {
     GLFWwindow *window;

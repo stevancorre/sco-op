@@ -104,7 +104,7 @@ static void __game_init_materials(Game *game)
     memcpy(game->materials, materials, game->material_count * sizeof(Material));
 
     program_use(game->programs[SHADER_STANDARD]);
-    material_send_to_program(game->materials[SHADER_STANDARD], game->programs[SHADER_STANDARD]);
+    material_send_to_program(game->materials[MATERIAL_STANDARD], game->programs[SHADER_STANDARD]);
     program_unuse();
 }
 
@@ -264,6 +264,8 @@ void game_render(Game game)
 
     // render stuff
     program_use(game.programs[SHADER_STANDARD]);
+
+    material_send_to_program(game.materials[MATERIAL_STANDARD], game.programs[SHADER_STANDARD]);
 
     texture_bind(game.textures[TEXTURE_64X_PLACEHOLDER], GL_TEXTURE0);
     mesh_render(game.meshes[MESH_PLAYER], game.programs[SHADER_STANDARD]);
