@@ -39,7 +39,7 @@ void main()
     vec3 position_to_view_direction = normalize(camera_position - vs_position);
     
     float specular_constant = pow(max(dot(position_to_view_direction, light_reflection_direction), 0), 35);
-    vec4 specular_color = vec4(material.specular * specular_constant, 1.f);
+    vec4 specular_color = vec4(material.specular * specular_constant * texture(material.specular_texture, vs_texcoord).rgb, 1.f);
 
     fs_color = 
         texture(material.diffuse_texture, vs_texcoord) *
