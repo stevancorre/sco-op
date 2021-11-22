@@ -33,16 +33,16 @@
 
 #define GLMS_VALUE_PTR(target) (float *)target.raw
 
-#define GLMS_VEC2_PRINT(target) printf("vec2(%f, %f)", target.x, target.y);
-#define GLMS_VEC2_PRINTLN(target) printf("vec2(%f, %f)\n", target.x, target.y);
+#define GLMS_VEC2_PRINT(target) printf("vec2(%f, %f)", target.x, target.y)
+#define GLMS_VEC2_PRINTLN(target) printf("vec2(%f, %f)\n", target.x, target.y)
 
-#define GLMS_VEC3_PRINT(target) printf("vec3(%f, %f, %f)", target.x, target.y, target.z);
-#define GLMS_VEC3_PRINTLN(target) printf("vec3(%f, %f, %f)\n", target.x, target.y, target.z);
+#define GLMS_VEC3_PRINT(target) printf("vec3(%f, %f, %f)", target.x, target.y, target.z)
+#define GLMS_VEC3_PRINTLN(target) printf("vec3(%f, %f, %f)\n", target.x, target.y, target.z)
 
-#define GLMS_VEC4_PRINT(target) printf("vec4(%f, %f, %f, %f)", target.x, target.y, target.z, target.w);
-#define GLMS_VEC4_PRINTLN(target) printf("vec4(%f, %f, %f, %f)\n", target.x, target.y, target.z, target.w);
+#define GLMS_VEC4_PRINT(target) printf("vec4(%f, %f, %f, %f)", target.x, target.y, target.z, target.w)
+#define GLMS_VEC4_PRINTLN(target) printf("vec4(%f, %f, %f, %f)\n", target.x, target.y, target.z, target.w)
 
-#define GLMS_MAT4_PRINT(target) printf("mat4(%f, %f, %f, %f)", target.x, target.y, target.z, target.w);
-#define GLMS_MAT4_PRINTLN(target) printf("mat4(%f, %f, %f, %f)\n", target.x, target.y, target.z, target.w);
+#define GLMS_MAT4_PRINT(target) printf("mat4(%f, %f, %f, %f)", target.x, target.y, target.z, target.w)
+#define GLMS_MAT4_PRINTLN(target) printf("mat4(%f, %f, %f, %f)\n", target.x, target.y, target.z, target.w)
 
 #endif // CGLM_EXT_H_
