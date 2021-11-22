@@ -1,5 +1,19 @@
 #include "game.h"
 
+static float clampf(float value, const float min, const float max)
+{
+    if (value < min)
+    {
+        return min;
+    }
+    else if (value > max)
+    {
+        return max;
+    }
+
+    return value;
+}
+
 static void __frame_buffer_resize_callback(GLFWwindow *window, int width, int height)
 {
     (void)window;
@@ -135,19 +149,13 @@ static void __game_init_uniforms(const Game *game)
 {
     program_use(game->programs[SHADER_STANDARD]);
 
-    program_set_mat4fv(game->programs[SHADER_STANDARD], "view_matrix", game->view_matrix, GL_FALSE);
+    program_set_mat4fv(game->programs[SHADER_STANDARD], "view_matrix", game->camera->view_matrix, GL_FALSE);
     program_set_mat4fv(game->programs[SHADER_STANDARD], "projection_matrix", game->projection_matrix, GL_FALSE);
 
     program_set_vec3fv(game->programs[SHADER_STANDARD], "light_position", game->lights[LIGHT_MAIN]);
-    program_set_vec3fv(game->programs[SHADER_STANDARD], "camera_position", game->camera_position);
+    program_set_vec3fv(game->programs[SHADER_STANDARD], "camera_position", game->camera->position);
 
     program_unuse();
-}
-
-static void __game_init_view(Game *game)
-{
-    game->world_up = GLMS_VEC3_UP;
-    game->camera_forward = GLMS_VEC3_BACK;
 }
 
 static void __game_update_delta_time(Game *game)
@@ -170,16 +178,26 @@ static void __game_update_camera(Game *game)
     game->projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
 
     // view
-    game->view_matrix = glms_lookat(game->camera_position, glms_vec3_add(game->camera_position, game->camera_forward), game->world_up);
+    camera_update_view_matrix(game->camera);
+}
+
+static void __game_init_camera(Game *game, const vec3s camera_position)
+{
+    game->world_up = GLMS_VEC3_UP;
+
+    game->camera = (Camera *)malloc(sizeof(Camera));
+    *game->camera = camera_init(camera_position, GLMS_VEC3_ZERO, game->world_up);
+
+    __game_update_camera(game);
 }
 
 static void __game_update_uniforms(Game game)
 {
     program_use(game.programs[SHADER_STANDARD]);
 
-    program_set_mat4fv(game.programs[SHADER_STANDARD], "view_matrix", game.view_matrix, GL_FALSE);
+    program_set_mat4fv(game.programs[SHADER_STANDARD], "view_matrix", game.camera->view_matrix, GL_FALSE);
     program_set_mat4fv(game.programs[SHADER_STANDARD], "projection_matrix", game.projection_matrix, GL_FALSE);
-    program_set_vec3fv(game.programs[SHADER_STANDARD], "camera_position", game.camera_position);
+    program_set_vec3fv(game.programs[SHADER_STANDARD], "camera_position", game.camera->position);
 
     program_unuse();
 }
@@ -196,37 +214,43 @@ static void __game_update_keyboard_input(Game *game)
     // move
     if (glfwGetKey(game->window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        movement.z -= 0.02f;
+        movement = glms_vec3_add(movement, game->camera->forward);
     }
     if (glfwGetKey(game->window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        movement.x -= 0.02f;
+        movement = glms_vec3_sub(movement, game->camera->right);
     }
     if (glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        movement.z += 0.02f;
+        movement = glms_vec3_sub(movement, game->camera->forward);
     }
     if (glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        movement.x += 0.02f;
+        movement = glms_vec3_add(movement, game->camera->right);
     }
     if (glfwGetKey(game->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-        movement.y -= 0.02f;
+        movement = glms_vec3_sub(movement, game->camera->up);
     }
     if (glfwGetKey(game->window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
-        movement.y += 0.02f;
+        movement = glms_vec3_add(movement, game->camera->up);
     }
 
-    game->camera_position = glms_vec3_add(game->camera_position, movement);
+    game->camera->position = glms_vec3_add(game->camera->position, glms_vec3_scale(movement, game->delta_time * game->camera->movement_speed));
 }
 
-static void __game_update_mouse_state(Game* game)
+static void __game_update_mouse_state(Game *game)
 {
     // get current mouse position
-    glfwGetCursorPos(game->window, &game->mouse_position.x, &game->mouse_position.y);
-    if(game->is_first_mouse)
+    double mouse_position_x = 0;
+    double mouse_position_y = 0;
+    glfwGetCursorPos(game->window, &mouse_position_x, &mouse_position_y);
+
+    game->mouse_position.x = (float)mouse_position_x;
+    game->mouse_position.y = (float)mouse_position_y;
+
+    if (game->is_first_mouse)
     {
         game->last_mouse_position = game->mouse_position;
         game->is_first_mouse = false;
@@ -234,7 +258,7 @@ static void __game_update_mouse_state(Game* game)
 
     // calculate offset
     game->mouse_offset.x = game->mouse_position.x - game->last_mouse_position.x;
-    game->mouse_offset.x = game->last_mouse_position.y - game->mouse_position.y;
+    game->mouse_offset.y = game->last_mouse_position.y - game->mouse_position.y;
 
     // set last mouse position
     game->last_mouse_position = game->mouse_position;
@@ -243,6 +267,16 @@ static void __game_update_mouse_state(Game* game)
 static void __game_update_mouse_input(Game *game)
 {
     __game_update_mouse_state(game);
+
+    game->camera->pitch += game->mouse_offset.y * game->camera->mouse_sensitivity * game->delta_time;
+    game->camera->yaw += game->mouse_offset.x * game->camera->mouse_sensitivity * game->delta_time;
+
+    game->camera->pitch = clampf(game->camera->pitch, -80, 80);
+    game->camera->yaw = fmodf(game->camera->yaw, 360);
+
+    printf("------------\nf: %f\ny: %f\n", game->camera->pitch, game->camera->yaw);
+
+    camera_update_vectors(game->camera);
 }
 
 Game game_init(const GLchar *title, const int window_width, const int window_height, const vec3s camera_position)
@@ -250,10 +284,10 @@ Game game_init(const GLchar *title, const int window_width, const int window_hei
     Game game = {
         .last_time = 0,
         .last_mouse_position = GLMS_VEC2_ZERO,
+
         .mouse_position = GLMS_VEC2_ZERO,
         .mouse_offset = GLMS_VEC2_ZERO,
-        .is_first_mouse = true,
-        .camera_position = camera_position};
+        .is_first_mouse = true};
 
     __init_glfw();
     __game_init_window(&game, title, window_width, window_height);
@@ -268,8 +302,7 @@ Game game_init(const GLchar *title, const int window_width, const int window_hei
     __game_init_meshes(&game);
     __game_init_lights(&game);
 
-    __game_init_view(&game);
-    __game_update_camera(&game);
+    __game_init_camera(&game, camera_position);
     __game_init_uniforms(&game);
 
     return game;

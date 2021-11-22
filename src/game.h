@@ -3,6 +3,8 @@
 
 #include "mesh.h"
 #include "light.h"
+#include "camera.h"
+
 #include <memory.h>
 
 #define WINDOW_WIDTH 800
@@ -39,12 +41,9 @@ typedef struct Game
     GLFWwindow *window;
 
     // view
-    vec3s camera_position;
-    vec3s camera_forward;
+    Camera* camera;
     vec3s world_up;
-
     mat4s projection_matrix;
-    mat4s view_matrix;
 
     // time
     double last_time;
