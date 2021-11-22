@@ -36,6 +36,9 @@ static void __game_init_window(Game *game, const GLchar *title, const int window
 
     // initialize context
     glfwMakeContextCurrent(game->window);
+
+    // options
+    glfwSetInputMode(game->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 static void __init_glew(Game *game)
@@ -141,6 +144,19 @@ static void __game_init_uniforms(const Game *game)
     program_unuse();
 }
 
+static void __game_init_view(Game *game)
+{
+    game->world_up = GLMS_VEC3_UP;
+    game->camera_forward = GLMS_VEC3_BACK;
+}
+
+static void __game_update_delta_time(Game *game)
+{
+    game->time = glfwGetTime();
+    game->delta_time = game->time - game->last_time;
+    game->last_time = game->time;
+}
+
 static void __game_update_camera(Game *game)
 {
     // projection
@@ -154,8 +170,7 @@ static void __game_update_camera(Game *game)
     game->projection_matrix = glms_perspective(glm_rad(fov), (float)frame_buffer_width / frame_buffer_height, nearPlane, farPlane);
 
     // view
-    vec3s camera_forward = GLMS_VEC3_BACK_INIT;
-    game->view_matrix = glms_lookat(game->camera_position, glms_vec3_add(game->camera_position, camera_forward), GLMS_VEC3_UP);
+    game->view_matrix = glms_lookat(game->camera_position, glms_vec3_add(game->camera_position, game->camera_forward), game->world_up);
 }
 
 static void __game_update_uniforms(Game game)
@@ -165,13 +180,79 @@ static void __game_update_uniforms(Game game)
     program_set_mat4fv(game.programs[SHADER_STANDARD], "view_matrix", game.view_matrix, GL_FALSE);
     program_set_mat4fv(game.programs[SHADER_STANDARD], "projection_matrix", game.projection_matrix, GL_FALSE);
     program_set_vec3fv(game.programs[SHADER_STANDARD], "camera_position", game.camera_position);
-    
+
     program_unuse();
+}
+
+static void __game_update_keyboard_input(Game *game)
+{
+    if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(game->window, GLFW_TRUE);
+    }
+
+    vec3s movement = GLMS_VEC3_ZERO_INIT;
+
+    // move
+    if (glfwGetKey(game->window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        movement.z -= 0.02f;
+    }
+    if (glfwGetKey(game->window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        movement.x -= 0.02f;
+    }
+    if (glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        movement.z += 0.02f;
+    }
+    if (glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        movement.x += 0.02f;
+    }
+    if (glfwGetKey(game->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    {
+        movement.y -= 0.02f;
+    }
+    if (glfwGetKey(game->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        movement.y += 0.02f;
+    }
+
+    game->camera_position = glms_vec3_add(game->camera_position, movement);
+}
+
+static void __game_update_mouse_state(Game* game)
+{
+    // get current mouse position
+    glfwGetCursorPos(game->window, &game->mouse_position.x, &game->mouse_position.y);
+    if(game->is_first_mouse)
+    {
+        game->last_mouse_position = game->mouse_position;
+        game->is_first_mouse = false;
+    }
+
+    // calculate offset
+    game->mouse_offset.x = game->mouse_position.x - game->last_mouse_position.x;
+    game->mouse_offset.x = game->last_mouse_position.y - game->mouse_position.y;
+
+    // set last mouse position
+    game->last_mouse_position = game->mouse_position;
+}
+
+static void __game_update_mouse_input(Game *game)
+{
+    __game_update_mouse_state(game);
 }
 
 Game game_init(const GLchar *title, const int window_width, const int window_height, const vec3s camera_position)
 {
     Game game = {
+        .last_time = 0,
+        .last_mouse_position = GLMS_VEC2_ZERO,
+        .mouse_position = GLMS_VEC2_ZERO,
+        .mouse_offset = GLMS_VEC2_ZERO,
+        .is_first_mouse = true,
         .camera_position = camera_position};
 
     __init_glfw();
@@ -187,8 +268,8 @@ Game game_init(const GLchar *title, const int window_width, const int window_hei
     __game_init_meshes(&game);
     __game_init_lights(&game);
 
+    __game_init_view(&game);
     __game_update_camera(&game);
-
     __game_init_uniforms(&game);
 
     return game;
@@ -203,57 +284,15 @@ void game_update_input(Game *game)
 {
     glfwPollEvents();
 
-    if (glfwGetKey(game->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(game->window, GLFW_TRUE);
-    }
-
-    vec3s movement = GLMS_VEC3_ZERO_INIT;
-    vec3s rotation = GLMS_VEC3_ZERO_INIT;
-
-    // move
-    if (glfwGetKey(game->window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        movement.z -= 0.01f;
-    }
-    if (glfwGetKey(game->window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        movement.x -= 0.01f;
-    }
-    if (glfwGetKey(game->window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        movement.z += 0.01f;
-    }
-    if (glfwGetKey(game->window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        movement.x += 0.01f;
-    }
-
-    // rotation
-    if (glfwGetKey(game->window, GLFW_KEY_LEFT) == GLFW_PRESS)
-    {
-        rotation.y -= 1.f;
-    }
-    if (glfwGetKey(game->window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-    {
-        rotation.y += 1.f;
-    }
-    if (glfwGetKey(game->window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        rotation.x -= 1.f;
-    }
-    if (glfwGetKey(game->window, GLFW_KEY_DOWN) == GLFW_PRESS)
-    {
-        rotation.x += 1.f;
-    }
-
-    mesh_offset_position(&game->meshes[MESH_PLAYER], movement);
-    mesh_offset_rotation(&game->meshes[MESH_PLAYER], rotation);
+    __game_update_keyboard_input(game);
+    __game_update_mouse_input(game);
 }
 
 void game_update(Game *game)
 {
+    __game_update_delta_time(game);
     __game_update_camera(game);
+
     mesh_update(&game->meshes[MESH_PLAYER]);
 }
 

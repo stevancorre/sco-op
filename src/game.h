@@ -40,9 +40,23 @@ typedef struct Game
 
     // view
     vec3s camera_position;
+    vec3s camera_forward;
+    vec3s world_up;
 
     mat4s projection_matrix;
     mat4s view_matrix;
+
+    // time
+    double last_time;
+    double delta_time;
+    double time;
+
+    // camera
+    // TODO: extract this to its own struct
+    vec2s last_mouse_position;
+    vec2s mouse_position;
+    vec2s mouse_offset;
+    bool is_first_mouse;
 
     // resources
     Texture *textures;
