@@ -1,7 +1,7 @@
 #ifndef MESH_H_
 #define MESH_H_
 
-#include "primitives.h"
+#include "primitive.h"
 #include "shader.h"
 #include "material.h"
 #include "texture.h"
@@ -22,7 +22,7 @@ typedef struct
     mat4s model_matrix;
 } Mesh;
 
-Mesh mesh_init(const Model model);
+Mesh mesh_init(const Primitive primitive);
 
 void mesh_set_position(Mesh *mesh, const vec3s value);
 

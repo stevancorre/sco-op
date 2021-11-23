@@ -1,9 +1,9 @@
 #include "mesh.h"
 
-void __mesh_init_vertex_array_object(Mesh *mesh, const Model model)
+void __mesh_init_vertex_array_object(Mesh *mesh, const Primitive primitive)
 {
-    mesh->vertex_count = model.vertex_count;
-    mesh->index_count = model.index_count;
+    mesh->vertex_count = primitive.vertex_count;
+    mesh->index_count = primitive.index_count;
 
     // generate vao and bind it
     // vao stands for Vertex Array Object
@@ -18,7 +18,7 @@ void __mesh_init_vertex_array_object(Mesh *mesh, const Model model)
     // in this case, we should GL_DYNAMIC_DRAW
     glCreateBuffers(1, &mesh->vertex_buffer_object);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer_object);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh->vertex_count, model.vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh->vertex_count, primitive.vertices, GL_STATIC_DRAW);
 
     // generate ebo, bind and send data
     // ebo stands for element buffer object
@@ -27,7 +27,7 @@ void __mesh_init_vertex_array_object(Mesh *mesh, const Model model)
     {
         glGenBuffers(1, &mesh->element_buffer_object);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->element_buffer_object);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->index_count, model.indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->index_count, primitive.indices, GL_STATIC_DRAW);
     }
 
     // set vertex attributes pointers and enable
@@ -61,14 +61,14 @@ void __mesh_init_model_matrix(Mesh *mesh)
     mesh_update(mesh);
 }
 
-Mesh mesh_init(const Model model)
+Mesh mesh_init(const Primitive primitive)
 {
     Mesh mesh;
 
-    __mesh_init_vertex_array_object(&mesh, model);
+    __mesh_init_vertex_array_object(&mesh, primitive);
     __mesh_init_model_matrix(&mesh);
 
-    model_free(model);
+    primitive_free(primitive);
 
     return mesh;
 }
