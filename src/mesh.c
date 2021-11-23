@@ -1,10 +1,7 @@
 #include "mesh.h"
 
-void __mesh_init_vertex_array_object(Mesh *mesh, const Primitive primitive)
+void __mesh_init_vertex_array_object(Mesh *mesh)
 {
-    mesh->vertex_count = primitive.vertex_count;
-    mesh->index_count = primitive.index_count;
-
     // generate vao and bind it
     // vao stands for Vertex Array Object
     // it basically holds datas for any renderable object
@@ -18,16 +15,16 @@ void __mesh_init_vertex_array_object(Mesh *mesh, const Primitive primitive)
     // in this case, we should GL_DYNAMIC_DRAW
     glCreateBuffers(1, &mesh->vertex_buffer_object);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer_object);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh->vertex_count, primitive.vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh->primitive.vertex_count, mesh->primitive.vertices, GL_STATIC_DRAW);
 
     // generate ebo, bind and send data
     // ebo stands for element buffer object
     // used for vertices indexing
-    if (mesh->index_count > 0)
+    if (mesh->primitive.index_count > 0)
     {
         glGenBuffers(1, &mesh->element_buffer_object);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->element_buffer_object);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->index_count, primitive.indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Index) * mesh->primitive.index_count, mesh->primitive.indices, GL_STATIC_DRAW);
     }
 
     // set vertex attributes pointers and enable
@@ -63,9 +60,11 @@ void __mesh_init_model_matrix(Mesh *mesh)
 
 Mesh mesh_init(const Primitive primitive)
 {
-    Mesh mesh;
+    Mesh mesh = {
+        .primitive = primitive 
+    };
 
-    __mesh_init_vertex_array_object(&mesh, primitive);
+    __mesh_init_vertex_array_object(&mesh);
     __mesh_init_model_matrix(&mesh);
 
     primitive_free(primitive);
@@ -127,13 +126,13 @@ void mesh_render(Mesh mesh, Program program)
     glBindVertexArray(mesh.vertex_array_object);
 
     // draw
-    if (mesh.index_count == 0)
+    if (mesh.primitive.index_count == 0)
     {
-        glDrawArrays(GL_TRIANGLES, 0, mesh.vertex_count);
+        glDrawArrays(GL_TRIANGLES, 0, mesh.primitive.vertex_count);
     }
     else
     {
-        glDrawElements(GL_TRIANGLES, mesh.index_count, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, mesh.primitive.index_count, GL_UNSIGNED_INT, 0);
     }
 
     glBindVertexArray(0);
@@ -144,7 +143,7 @@ void mesh_delete(Mesh *mesh)
     glDeleteVertexArrays(1, &mesh->vertex_array_object);
     glDeleteBuffers(1, &mesh->vertex_buffer_object);
 
-    if (mesh->index_count > 0)
+    if (mesh->primitive.index_count > 0)
     {
         glDeleteBuffers(1, &mesh->element_buffer_object);
     }

@@ -8,8 +8,7 @@
 
 typedef struct
 {
-    GLuint vertex_count;
-    GLuint index_count;
+    Primitive primitive;
 
     GLuint vertex_array_object;
     GLuint vertex_buffer_object;

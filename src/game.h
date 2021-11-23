@@ -1,7 +1,7 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-#include "mesh.h"
+#include "model.h"
 #include "light.h"
 #include "camera.h"
 
@@ -34,6 +34,11 @@ enum MESHES
 enum MATERIALS
 {
     MATERIAL_STANDARD = 0
+};
+
+enum MODELS
+{
+    MODEL_PLAYER = 0
 };
 
 typedef struct Game
@@ -72,6 +77,9 @@ typedef struct Game
 
     Light *lights;
     GLuint light_count;
+
+    Model* models;
+    GLuint model_count;
 } Game;
 
 Game game_init(const GLchar *title, const int window_width, const int window_height, const vec3s camera_position);

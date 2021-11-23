@@ -145,6 +145,20 @@ static void __game_init_lights(Game *game)
     memcpy(game->lights, lights, game->light_count * sizeof(Light));
 }
 
+static void __game_init_models(Game *game)
+{
+    const Model models[] = {
+        [MODEL_PLAYER] = model_init(
+            GLMS_VEC3_BACK, 
+            game->materials[MATERIAL_STANDARD], 
+            game->textures[TEXTURE_64X_PLACEHOLDER], game->textures[TEXTURE_64X_PLACEHOLDER], 
+            game->meshes, game->mesh_count)};
+
+    game->model_count = sizeof(models) / sizeof(Model);
+    game->models = (Model *)malloc(game->model_count * sizeof(Model));
+    memcpy(game->models, models, game->model_count * sizeof(Model));
+}
+
 static void __game_init_uniforms(const Game *game)
 {
     program_use(game->programs[SHADER_STANDARD]);
@@ -193,13 +207,9 @@ static void __game_init_camera(Game *game, const vec3s camera_position)
 
 static void __game_update_uniforms(Game game)
 {
-    program_use(game.programs[SHADER_STANDARD]);
-
     program_set_mat4fv(game.programs[SHADER_STANDARD], "view_matrix", game.camera->view_matrix, GL_FALSE);
     program_set_mat4fv(game.programs[SHADER_STANDARD], "projection_matrix", game.projection_matrix, GL_FALSE);
     program_set_vec3fv(game.programs[SHADER_STANDARD], "camera_position", game.camera->position);
-
-    program_unuse();
 }
 
 static void __game_update_keyboard_input(Game *game)
@@ -274,8 +284,6 @@ static void __game_update_mouse_input(Game *game)
     game->camera->pitch = clampf(game->camera->pitch, -80, 80);
     game->camera->yaw = fmodf(game->camera->yaw, 360);
 
-    printf("------------\nf: %f\ny: %f\n", game->camera->pitch, game->camera->yaw);
-
     camera_update_vectors(game->camera);
 }
 
@@ -301,6 +309,7 @@ Game game_init(const GLchar *title, const int window_width, const int window_hei
     __game_init_materials(&game);
     __game_init_meshes(&game);
     __game_init_lights(&game);
+    __game_init_models(&game);
 
     __game_init_camera(&game, camera_position);
     __game_init_uniforms(&game);
@@ -335,25 +344,20 @@ void game_render(Game game)
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    // bind shaders and textures
+    // bind
+    program_use(game.programs[SHADER_STANDARD]);
 
     // update uniforms
     __game_update_uniforms(game);
 
     // render stuff
-    program_use(game.programs[SHADER_STANDARD]);
+    for (GLuint i = 0; i < game.model_count; i++)
+    {
+        model_render(game.models[i], game.programs[SHADER_STANDARD]);
+    }
 
-    material_send_to_program(game.materials[MATERIAL_STANDARD], game.programs[SHADER_STANDARD]);
-
-    texture_bind(game.textures[TEXTURE_64X_PLACEHOLDER], GL_TEXTURE0);
-    mesh_render(game.meshes[MESH_PLAYER], game.programs[SHADER_STANDARD]);
-
-    texture_bind(game.textures[TEXTURE_IMG_PLACEHOLDER], GL_TEXTURE0);
-
-    // unbind everything
+    // unbind
     program_unuse();
-    texture_unbind(game.textures[TEXTURE_64X_PLACEHOLDER]);
-    texture_unbind(game.textures[TEXTURE_IMG_PLACEHOLDER]);
 
     // end draw
     glfwSwapBuffers(game.window);
