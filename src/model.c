@@ -18,6 +18,70 @@ Model model_init(
     return model;
 }
 
+void model_set_position(const Model *model, const vec3s value)
+{
+    for(GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_set_position(&model->meshes[i], value);
+    }
+}
+
+void model_set_rotation(const Model *model, const vec3s value)
+{
+    for(GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_set_rotation(&model->meshes[i], value);
+    }
+}
+
+void model_set_scale(const Model *model, const vec3s value)
+{
+    for(GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_set_scale(&model->meshes[i], value);
+    }
+}
+
+void model_offset_position(const Model *model, const vec3s offset)
+{
+    for(GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_offset_position(&model->meshes[i], offset);
+    }
+}
+
+void modell_offset_rotation(const Model *model, const vec3s offset)
+{
+    for(GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_offset_rotation(&model->meshes[i], offset);
+    }
+}
+
+void model_offset_scale(const Model *model, const vec3s offset)
+{
+    for(GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_offset_scale(&model->meshes[i], offset);
+    }
+}
+
+void model_offset_rotation(const Model* model, const vec3s offset)
+{
+    for (GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_offset_rotation(&model->meshes[i], offset);
+    }
+}
+
+void model_update(const Model* model)
+{
+    for (GLuint i = 0; i < model->mesh_count; i++)
+    {
+        mesh_update(&model->meshes[i]);
+    }
+}
+
 void model_render(const Model model, const Program program)
 {
     // bind

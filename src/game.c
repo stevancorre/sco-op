@@ -128,7 +128,7 @@ static void __game_init_materials(Game *game)
 static void __game_init_meshes(Game *game)
 {
     const Mesh meshes[] = {
-        [MESH_PLAYER] = mesh_init(primitive_init_pyramid())};
+        [MESH_PYRAMID] = mesh_init(primitive_init_pyramid(), MESH_DEFAULT_INIT)};
 
     game->mesh_count = sizeof(meshes) / sizeof(Mesh);
     game->meshes = (Mesh *)malloc(game->mesh_count * sizeof(Mesh));
@@ -148,7 +148,7 @@ static void __game_init_lights(Game *game)
 static void __game_init_models(Game *game)
 {
     const Model models[] = {
-        [MODEL_PLAYER] = model_init(
+        [MODEL_PYRAMID] = model_init(
             GLMS_VEC3_BACK, 
             game->materials[MATERIAL_STANDARD], 
             game->textures[TEXTURE_64X_PLACEHOLDER], game->textures[TEXTURE_64X_PLACEHOLDER], 
@@ -287,6 +287,22 @@ static void __game_update_mouse_input(Game *game)
     camera_update_vectors(game->camera);
 }
 
+static void __game_update_models(const Game* game)
+{
+    for (GLuint i = 0; i < game->model_count; i++)
+    {
+        model_update(&game->models[i]);
+    }
+}
+
+static void __game_render_models(const Game* game, const Program program)
+{
+    for (GLuint i = 0; i < game->model_count; i++)
+    {
+        model_render(game->models[i], program);
+    }
+}
+
 Game game_init(const GLchar *title, const int window_width, const int window_height, const vec3s camera_position)
 {
     Game game = {
@@ -335,7 +351,9 @@ void game_update(Game *game)
     __game_update_delta_time(game);
     __game_update_camera(game);
 
-    mesh_update(&game->meshes[MESH_PLAYER]);
+    model_offset_rotation(game->models + MODEL_PYRAMID, GLMS_VEC3_UP);
+
+    __game_update_models(game);
 }
 
 void game_render(Game game)
@@ -351,11 +369,7 @@ void game_render(Game game)
     __game_update_uniforms(game);
 
     // render stuff
-    for (GLuint i = 0; i < game.model_count; i++)
-    {
-        model_render(game.models[i], game.programs[SHADER_STANDARD]);
-    }
-
+    __game_render_models(&game, game.programs[SHADER_STANDARD]);
     // unbind
     program_unuse();
 

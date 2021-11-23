@@ -49,27 +49,29 @@ void __mesh_init_vertex_array_object(Mesh *mesh)
     glBindVertexArray(0);
 }
 
-void __mesh_init_model_matrix(Mesh *mesh)
-{
-    mesh_set_position(mesh, GLMS_VEC3_ZERO);
-    mesh_set_rotation(mesh, GLMS_VEC3_ZERO);
-    mesh_set_scale(mesh, GLMS_VEC3_ONE);
-
-    mesh_update(mesh);
-}
-
-Mesh mesh_init(const Primitive primitive)
+Mesh mesh_init(const Primitive primitive, const vec3s pivot, const vec3s position, const vec3s rotation, const vec3s scale)
 {
     Mesh mesh = {
-        .primitive = primitive 
+        .primitive = primitive
     };
 
     __mesh_init_vertex_array_object(&mesh);
-    __mesh_init_model_matrix(&mesh);
+
+    mesh_set_pivot(&mesh, pivot);
+    mesh_set_position(&mesh, position);
+    mesh_set_rotation(&mesh, rotation);
+    mesh_set_scale(&mesh, scale);
+
+    mesh_update(&mesh);
 
     primitive_free(primitive);
 
     return mesh;
+}
+
+void mesh_set_pivot(Mesh* mesh, const vec3s value)
+{
+    mesh->pivot = value;
 }
 
 void mesh_set_position(Mesh *mesh, const vec3s value)
@@ -106,13 +108,14 @@ void mesh_update(Mesh *mesh)
 {
     mesh->model_matrix = glms_mat4_identity();
 
-    // position
-    mesh->model_matrix = glms_translate(mesh->model_matrix, mesh->position);
-
     // rotation
+    mesh->model_matrix = glms_translate(mesh->model_matrix, mesh->pivot);
     mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.x), GLMS_VEC3_X);
     mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.y), GLMS_VEC3_Y);
     mesh->model_matrix = glms_rotate(mesh->model_matrix, glm_rad(mesh->rotation.z), GLMS_VEC3_Z);
+
+    // position
+    mesh->model_matrix = glms_translate(mesh->model_matrix, glms_vec3_sub(mesh->position, mesh->pivot));
 
     // scale
     mesh->model_matrix = glms_scale(mesh->model_matrix, mesh->scale);

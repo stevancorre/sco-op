@@ -6,6 +6,8 @@
 #include "material.h"
 #include "texture.h"
 
+#define MESH_DEFAULT_INIT GLMS_VEC3_ZERO, GLMS_VEC3_ZERO, GLMS_VEC3_ZERO, GLMS_VEC3_ONE
+
 typedef struct
 {
     Primitive primitive;
@@ -16,12 +18,15 @@ typedef struct
 
     vec3s position;
     vec3s rotation;
+    vec3s pivot;
     vec3s scale;
 
     mat4s model_matrix;
 } Mesh;
 
-Mesh mesh_init(const Primitive primitive);
+Mesh mesh_init(const Primitive primitive, const vec3s pivot, const vec3s position, const vec3s rotation, const vec3s scale);
+
+void mesh_set_pivot(Mesh* mesh, const vec3s value);
 
 void mesh_set_position(Mesh *mesh, const vec3s value);
 

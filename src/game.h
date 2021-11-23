@@ -28,7 +28,7 @@ enum LIGHTS
 
 enum MESHES
 {
-    MESH_PLAYER = 0
+    MESH_PYRAMID = 0
 };
 
 enum MATERIALS
@@ -38,7 +38,7 @@ enum MATERIALS
 
 enum MODELS
 {
-    MODEL_PLAYER = 0
+    MODEL_PYRAMID = 0
 };
 
 typedef struct Game

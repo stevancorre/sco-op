@@ -5,6 +5,7 @@
 #include <memory.h>
 
 #include "vertex.h"
+#include "cglm_ext.h"
 
 typedef GLuint Index;
 
