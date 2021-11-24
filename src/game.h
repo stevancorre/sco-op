@@ -1,11 +1,12 @@
 #ifndef GAME_H_
 #define GAME_H_
 
+#include <memory.h>
+
+#include "obj_loader.h"
 #include "model.h"
 #include "light.h"
 #include "camera.h"
-
-#include <memory.h>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600

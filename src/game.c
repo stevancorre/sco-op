@@ -128,7 +128,7 @@ static void __game_init_materials(Game *game)
 static void __game_init_meshes(Game *game)
 {
     const Mesh meshes[] = {
-        [MESH_PYRAMID] = mesh_init(primitive_init_pyramid(), MESH_DEFAULT_INIT)};
+        [MESH_PYRAMID] = mesh_init(obj_load("assets/pyramid.obj"), MESH_DEFAULT_INIT)};
 
     game->mesh_count = sizeof(meshes) / sizeof(Mesh);
     game->meshes = (Mesh *)malloc(game->mesh_count * sizeof(Mesh));
